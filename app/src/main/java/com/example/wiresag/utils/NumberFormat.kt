@@ -1,4 +1,4 @@
-package com.example.sensors.utils
+package com.example.wiresag.utils
 
 import kotlin.math.*
 

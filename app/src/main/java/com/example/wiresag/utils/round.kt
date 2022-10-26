@@ -1,4 +1,4 @@
-package com.example.sensors.utils
+package com.example.wiresag.utils
 
 fun Double.round(decimals: Int): Double {
     val d = pow10(decimals)

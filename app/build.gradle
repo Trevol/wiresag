@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.sensors'
+    namespace 'com.example.wiresag'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.sensors"
+        applicationId "com.example.wiresag"
         minSdk 29
         targetSdk 32
         versionCode 1

@@ -1,4 +1,4 @@
-package com.example.sensors
+package com.example.wiresag
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,10 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.sensors.ui.theme.SensorsTheme
-import com.example.sensors.utils.DMS
-import com.example.sensors.utils.PermissionsRequest
-import com.example.sensors.utils.prettyFormat
+import com.example.wiresag.ui.theme.SensorsTheme
+import com.example.wiresag.utils.DMS
+import com.example.wiresag.utils.PermissionsRequest
+import com.example.wiresag.utils.prettyFormat
 
 class WireSagActivity : ComponentActivity() {
     private val permissionsRequest = PermissionsRequest(

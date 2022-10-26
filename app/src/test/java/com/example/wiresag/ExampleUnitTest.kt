@@ -1,10 +1,7 @@
-package com.example.sensors
+package com.example.wiresag
 
-import android.location.Location
-import com.example.sensors.utils.*
+import com.example.wiresag.utils.*
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).

@@ -1,4 +1,4 @@
-package com.example.sensors.ui.theme
+package com.example.wiresag.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

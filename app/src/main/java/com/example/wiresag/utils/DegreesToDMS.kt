@@ -1,4 +1,4 @@
-package com.example.sensors.utils
+package com.example.wiresag.utils
 
 import android.location.Location
 import kotlin.jvm.JvmInline
