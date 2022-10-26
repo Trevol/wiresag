@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.wiresag.ui.theme.SensorsTheme
+import com.example.wiresag.ui.theme.WireSagTheme
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.utils.prettyFormat
@@ -94,7 +94,7 @@ class WireSagActivity : ComponentActivity() {
         }
 
         setContent {
-            SensorsTheme {
+            WireSagTheme {
 
                 Surface(
                     color = MaterialTheme.colors.background
