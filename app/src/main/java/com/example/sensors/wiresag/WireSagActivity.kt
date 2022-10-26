@@ -1,9 +1,8 @@
-package com.example.sensors
+package com.example.sensors.wiresag
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -21,13 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.app.ActivityCompat
 import com.example.sensors.ui.theme.SensorsTheme
 import com.example.sensors.utils.DMS
 import com.example.sensors.utils.PermissionsRequest
 import com.example.sensors.utils.prettyFormat
 
-class MainActivity : ComponentActivity() {
+class WireSagActivity : ComponentActivity() {
     private val permissionsRequest = PermissionsRequest(
         this,
         Manifest.permission.ACCESS_COARSE_LOCATION,
