@@ -1,0 +1,7 @@
++++ start/stop consume events
++++ convert degrees to degrees/minutes/seconds  (copy from netmarkup_app)
+
+Опора 1: 45.567/23.777
+Опора 2: 45.567/23.777  Зафиксировать
+Фото: ...
+Разметка фото:
