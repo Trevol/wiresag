@@ -1,7 +1,21 @@
+- поворот устройства без пересоздания activity
+-
+
 +++ start/stop consume events
 +++ convert degrees to degrees/minutes/seconds  (copy from netmarkup_app)
 
+
+
 Опора 1: 45.567/23.777
 Опора 2: 45.567/23.777  Зафиксировать
-Фото: ...
+Фото:
+    - выход на позицию + фото
 Разметка фото:
+    - Выбор опор
+    - Выбор точки на проводе
+    - вычисление провисания
+
+
+WireSagViewModel
+ @Composable
+ fun view(){}
