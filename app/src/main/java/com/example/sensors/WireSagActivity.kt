@@ -1,4 +1,4 @@
-package com.example.sensors.wiresag
+package com.example.sensors
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -47,11 +47,11 @@ class WireSagActivity : ComponentActivity() {
         }
 
         override fun onProviderEnabled(provider: String) {
-            Log.d("INFO-", "onProviderEnabled: $provider")
+            gpsEnabled = true
         }
 
         override fun onProviderDisabled(provider: String) {
-            Log.d("INFO-", "onProviderDisabled: $provider")
+            gpsEnabled = false
         }
     }
 
@@ -104,11 +104,12 @@ class WireSagActivity : ComponentActivity() {
                         if (gpsEnabled) {
                             if (started) {
                                 val location = location
-                                if (location != null) {
-                                    Column {
-                                        Button(onClick = ::stopProcessLocation) {
-                                            Text("Stop")
-                                        }
+                                Column {
+                                    Button(onClick = ::stopProcessLocation) {
+                                        Text("Stop")
+                                    }
+                                    if (location != null) {
+
                                         Row {
                                             Text("Lat: ${DMS(location.latitude).prettyFormat()}")
                                             Text(" (${location.latitude})")
@@ -120,9 +121,9 @@ class WireSagActivity : ComponentActivity() {
 
                                         Text("Alt: ${location.altitude}")
                                         Text("Accuracy: ${location.accuracy}")
+                                    } else {
+                                        Text("Finding location...")
                                     }
-                                } else {
-                                    Text("Finding location...")
                                 }
 
                             } else {

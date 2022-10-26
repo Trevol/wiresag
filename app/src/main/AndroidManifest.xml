@@ -13,13 +13,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Sensors"
+        android:theme="@style/Theme.WireSag"
         tools:targetApi="31">
         <activity
-            android:name=".wiresag.WireSagActivity"
+            android:name=".WireSagActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Sensors">
+            android:theme="@style/Theme.WireSag">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
