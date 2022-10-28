@@ -8,6 +8,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,7 @@ class WireSagActivity : ComponentActivity() {
             return
         }
         locationManager.removeUpdates(gpsLocationListener)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         started = false
     }
 
@@ -70,6 +72,7 @@ class WireSagActivity : ComponentActivity() {
         if (started) {
             return
         }
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             1000L,
@@ -151,14 +154,6 @@ class WireSagActivity : ComponentActivity() {
     private fun onAppReady() {
         //start consume location events
         gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     companion object {

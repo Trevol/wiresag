@@ -16,9 +16,9 @@
         android:theme="@style/Theme.WireSag"
         tools:targetApi="31">
         <activity
-            android:name=".WireSagActivity"
+            android:name="com.example.wiresag.WireSagActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.WireSag">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
