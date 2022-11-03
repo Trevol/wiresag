@@ -21,16 +21,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.wiresag.ui.Main
+import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.ui.theme.WireSagTheme
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.utils.prettyFormat
 
 class WireSagActivity : ComponentActivity() {
-    private val permissionsRequest = PermissionsRequest(
+    private fun permissionsRequest() = PermissionsRequest(
         this,
         Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.INTERNET,
+        Manifest.permission.ACCESS_NETWORK_STATE
     )
 
     private lateinit var locationManager: LocationManager
@@ -82,82 +86,77 @@ class WireSagActivity : ComponentActivity() {
         started = true
     }
 
+    private fun createWireSagViewModel(): WireSagViewModel {
+        return WireSagViewModel()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        var permissionsGranted by mutableStateOf(false)
+        setContent { Text("Проверка разрешений...") }
 
-        permissionsRequest.launch { granted ->
-            permissionsGranted = granted
-            if (granted) {
-                onAppReady()
+        permissionsRequest().launch { granted ->
+            setContent {
+                if (granted) {
+                    Main { createWireSagViewModel().View() }
+                } else {
+                    NoPermissions()
+                }
             }
         }
 
-        setContent {
-            WireSagTheme {
-
-                Surface(
-                    color = MaterialTheme.colors.background
-                ) {
-
-                    if (permissionsGranted) {
-                        if (gpsEnabled) {
-                            if (started) {
-                                val location = location
-                                Column {
-                                    Button(onClick = ::stopProcessLocation) {
-                                        Text("Stop")
-                                    }
-                                    if (location != null) {
-
-                                        Row {
-                                            Text("Lat: ${DMS(location.latitude).prettyFormat()}")
-                                            Text(" (${location.latitude})")
-                                        }
-                                        Row {
-                                            Text("Lon: ${DMS(location.longitude).prettyFormat()}")
-                                            Text(" (${location.longitude})")
-                                        }
-
-                                        Text("Alt: ${location.altitude}")
-                                        Text("Accuracy: ${location.accuracy}")
-                                    } else {
-                                        Text("Finding location...")
-                                    }
+        /*setContent {
+            Main {
+                if (permissionsGranted) {
+                    if (gpsEnabled) {
+                        if (started) {
+                            val location = location
+                            Column {
+                                Button(onClick = ::stopProcessLocation) {
+                                    Text("Stop")
                                 }
+                                if (location != null) {
 
-                            } else {
-                                Button(onClick = ::startProcessLocation) {
-                                    Text("Start")
+                                    Row {
+                                        Text("Lat: ${DMS(location.latitude).prettyFormat()}")
+                                        Text(" (${location.latitude})")
+                                    }
+                                    Row {
+                                        Text("Lon: ${DMS(location.longitude).prettyFormat()}")
+                                        Text(" (${location.longitude})")
+                                    }
+
+                                    Text("Alt: ${location.altitude}")
+                                    Text("Accuracy: ${location.accuracy}")
+                                } else {
+                                    Text("Finding location...")
                                 }
                             }
 
                         } else {
-                            Text("Gps is disabled")
+                            Button(onClick = ::startProcessLocation) {
+                                Text("Start")
+                            }
                         }
 
-
                     } else {
-                        NoPermissions()
+                        Text("Gps is disabled")
                     }
+
 
                 }
 
             }
-        }
+
+        }*/
     }
+
 
     @SuppressLint("MissingPermission")
     private fun onAppReady() {
         //start consume location events
         gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-    }
-
-    companion object {
-        @Composable
-        private fun NoPermissions() = Text(text = "No permissions!")
     }
 }

@@ -1,6 +1,6 @@
-- поворот устройства без пересоздания activity
 -
 
++++ поворот устройства без пересоздания activity
 +++ start/stop consume events
 +++ convert degrees to degrees/minutes/seconds  (copy from netmarkup_app)
 
@@ -14,8 +14,3 @@
     - Выбор опор
     - Выбор точки на проводе
     - вычисление провисания
-
-
-WireSagViewModel
- @Composable
- fun view(){}
