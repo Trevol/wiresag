@@ -15,11 +15,7 @@ import org.osmdroid.views.MapView
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
     val context = LocalContext.current
-    val mapView = remember {
-        MapView(context).apply {
-//            id = R.id.map
-        }
-    }
+    val mapView = remember { MapView(context) }
 
     // Makes MapView follow the lifecycle of this composable
     val lifecycleObserver = rememberMapLifecycleObserver(mapView)

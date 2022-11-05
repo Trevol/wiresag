@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toDrawable
 import androidx.preference.PreferenceManager
 import com.example.wiresag.osmdroid.compose.MapView
+import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.theme.WireSagTheme
 import com.example.wiresag.utils.PermissionsRequest
 import org.osmdroid.config.Configuration
@@ -48,20 +49,6 @@ class MainActivityMap : ComponentActivity() {
             applicationContext,
             PreferenceManager.getDefaultSharedPreferences(applicationContext)
         )
-
-        /*setContent {
-            Content.Main {
-                Box(Modifier.fillMaxSize()) {
-
-                    Text("qqqqq")
-                    Text("qqqqq")
-                    Button(onClick = { }) {
-                        Text("Опора")
-                    }
-                }
-            }
-        }*/
-
 
         val pt = GeoPoint(45.0, 35.5)
         val items = mutableListOf(OverlayItem("", "", pt))
@@ -107,7 +94,7 @@ class MainActivityMap : ComponentActivity() {
             mapInstance!!.postInvalidate()
         }
 
-        fun mapOnLoad(map: MapView) {
+        fun onMapInit(map: MapView) {
             mapInstance = map
             map.setMultiTouchControls(true)
             map.overlays.add(locationOverlay)
@@ -126,7 +113,7 @@ class MainActivityMap : ComponentActivity() {
                 Main {
                     if (granted) {
                         Box() {
-                            Map(::mapOnLoad)
+                            MapView(modifier = Modifier.fillMaxSize(), ::onMapInit)
 
                             Row(
                                 modifier = Modifier.padding(start = 20.dp),
@@ -151,7 +138,7 @@ class MainActivityMap : ComponentActivity() {
     }
 
 
-    object Bitmaps {
+    private object Bitmaps {
         val pylonDrawable: Drawable =
             circleBitmap(android.graphics.Color.RED).toDrawable(Resources.getSystem())
         val location = circleBitmap(android.graphics.Color.GREEN)
@@ -171,24 +158,5 @@ class MainActivityMap : ComponentActivity() {
                 })
             return bmp
         }
-    }
-
-    companion object {
-
-        @Composable
-        fun Map(onLoad: (map: MapView) -> Unit = {}) =
-            MapView(modifier = Modifier.fillMaxSize(), onLoad)
-
-        @Composable
-        fun Main(content: @Composable () -> Unit) =
-            WireSagTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    content()
-                }
-            }
-
     }
 }
