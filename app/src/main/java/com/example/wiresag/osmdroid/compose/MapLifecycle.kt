@@ -3,6 +3,7 @@ package com.example.wiresag.osmdroid.compose
 
 //https://gist.github.com/ArnyminerZ/418683e3ef43ccf1268f9f62940441b1
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -13,9 +14,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import org.osmdroid.views.MapView
 
 @Composable
-fun rememberMapViewWithLifecycle(): MapView {
+fun <MV : MapView> rememberMapViewWithLifecycle(factory: (Context) -> MV): MV {
     val context = LocalContext.current
-    val mapView = remember { MapView(context) }
+    val mapView = remember { factory(context) }
 
     // Makes MapView follow the lifecycle of this composable
     val lifecycleObserver = rememberMapLifecycleObserver(mapView)
@@ -29,6 +30,10 @@ fun rememberMapViewWithLifecycle(): MapView {
 
     return mapView
 }
+
+@Composable
+fun rememberMapViewWithLifecycle() =
+    rememberMapViewWithLifecycle(factory = { context -> MapView(context) })
 
 @Composable
 fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =

@@ -7,8 +7,8 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import kotlin.random.Random
 
 class DummyLocationProvider(
-    val latDelta: Double = 0.003,
-    val lonDelta: Double = 0.001,
+    val latDelta: Double = 0.0003,
+    val lonDelta: Double = 0.0001,
     val initialDelay: Long = 5000,
     val initialLocation: Location? = dummyLocation()
 ) : IMyLocationProvider {

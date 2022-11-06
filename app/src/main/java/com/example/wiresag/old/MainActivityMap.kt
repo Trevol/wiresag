@@ -1,9 +1,10 @@
-package com.example.wiresag
+package com.example.wiresag.old
 
 import android.Manifest
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -11,17 +12,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toDrawable
 import androidx.preference.PreferenceManager
 import com.example.wiresag.osmdroid.compose.MapView
 import com.example.wiresag.ui.Main
-import com.example.wiresag.ui.theme.WireSagTheme
 import com.example.wiresag.utils.PermissionsRequest
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -140,9 +137,9 @@ class MainActivityMap : ComponentActivity() {
 
     private object Bitmaps {
         val pylonDrawable: Drawable =
-            circleBitmap(android.graphics.Color.RED).toDrawable(Resources.getSystem())
-        val location = circleBitmap(android.graphics.Color.GREEN)
-        val direction = circleBitmap(android.graphics.Color.BLACK)
+            circleBitmap(Color.RED).toDrawable(Resources.getSystem())
+        val location = circleBitmap(Color.GREEN)
+        val direction = circleBitmap(Color.BLACK)
 
         private fun circleBitmap(circleColor: Int): Bitmap {
             val bmp = Bitmap.createBitmap(31, 31, Bitmap.Config.ARGB_8888)

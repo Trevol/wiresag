@@ -36,19 +36,13 @@ class WireSagActivity : ComponentActivity() {
         Manifest.permission.ACCESS_NETWORK_STATE
     )
 
-    private fun stopProcessLocation() {
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-    }
-
     private fun createWireSagViewModel(): WireSagViewModel {
         /*val locationProvider = GpsMyLocationProvider(applicationContext)
             .apply {
                 locationUpdateMinDistance = 0f
                 locationUpdateMinTime = 1000
             }*/
-        val locationProvider = DummyLocationProvider()
+        val locationProvider = DummyLocationProvider(initialLocation = null)
 
         return WireSagViewModel(applicationContext, locationProvider)
     }
@@ -57,6 +51,7 @@ class WireSagActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        //window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContent { Text("Проверка разрешений...") }
 

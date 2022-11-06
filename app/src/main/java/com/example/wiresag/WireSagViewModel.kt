@@ -1,13 +1,7 @@
 package com.example.wiresag
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -17,28 +11,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toDrawable
 import androidx.preference.PreferenceManager
-import com.example.wiresag.osmdroid.SimpleLocationOverlay2
-import com.example.wiresag.osmdroid.compose.MapView
+import com.example.wiresag.mapView.WireSagMap
+import com.example.wiresag.mapView.WireSagMapView
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.prettyFormat
 import com.example.wiresag.utils.round
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import org.osmdroid.views.overlay.mylocation.SimpleLocationOverlay
 
 class WireSagViewModel(
     applicationContext: Context,
     private val locationProvider: IMyLocationProvider
-) : IMyLocationConsumer {
-    private var mapInstance: MapView? = null
-    private var myLocation by mutableStateOf(null as Location?)
-    private val locationOverlay = SimpleLocationOverlay2(Marker.location)
+) {
+    private var currentLocation by mutableStateOf(null as Location?)
+    private var prevLocation: Location? = null
 
     init {
         // Map not working without this line of code
@@ -51,44 +39,27 @@ class WireSagViewModel(
     }
 
     fun enableMyLocation() {
-        locationProvider.startLocationProvider(this)
+        locationProvider.startLocationProvider { location, _ -> updateMyLocation(location) }
     }
 
     fun disableMyLocation() {
         locationProvider.stopLocationProvider()
     }
 
-    override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
-        updateMyLocation(location)
-    }
-
     private fun updateMyLocation(newLocation: Location?) {
-        val locationIsInitial = newLocation != null && myLocation == null
-        myLocation = newLocation
-        locationOverlay.setLocation(myLocation?.let { GeoPoint(it) })
+        prevLocation = currentLocation
+        currentLocation = newLocation
+    }
+
+    private fun updateMapView(map: WireSagMapView) {
+        map.locationOverlay.setLocation(currentLocation?.let { GeoPoint(it) })
+
+        val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
-            mapInstance?.controller?.animateTo(GeoPoint(myLocation!!), 15.0, null)
+            map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
         } else {
-            mapInstance?.postInvalidate()
+            map.postInvalidate()
         }
-    }
-
-
-    private fun initMapView(map: MapView) {
-        mapInstance = map
-        map.setMultiTouchControls(true)
-        map.overlays.add(locationOverlay)
-
-        //TODO: move to updateMapView
-        if (myLocation == null) {
-            map.controller.setZoom(10.0)
-        } else {
-            map.controller.animateTo(GeoPoint(myLocation!!), 15.0, null)
-        }
-    }
-
-    private fun updateMapView(map: MapView) {
-        myLocation
     }
 
     @Composable
@@ -96,9 +67,9 @@ class WireSagViewModel(
         Column(modifier = Modifier.fillMaxSize()) {
 
             Box(modifier = Modifier.weight(1f)) {
-                MapView(
+                WireSagMap(
                     modifier = Modifier.fillMaxSize(),
-                    onInitMapView = ::initMapView,
+                    onInitMapView = { it.controller.setZoom(15.0) },
                     onUpdateMapView = ::updateMapView
                 )
                 Row(
@@ -115,42 +86,24 @@ class WireSagViewModel(
 
             }
             Box() {
-                val loc = myLocation
-                Row {
-                    Text("Лок-я: ")
-                    if (loc == null) {
-                        Text("определяется...")
-                    } else {
-                        Text(loc.info())
-                    }
-                }
+                LocationInfo(currentLocation)
             }
         }
 
     }
 }
 
-private fun Location.info() =
-    "${DMS(latitude).prettyFormat()} ${DMS(longitude).prettyFormat()} ${accuracy.round(1)}"
-
-private object Marker {
-    val pylonDrawable: Drawable =
-        circleBitmap(android.graphics.Color.RED).toDrawable(Resources.getSystem())
-    val location = circleBitmap(android.graphics.Color.GREEN)
-    val direction = circleBitmap(android.graphics.Color.BLACK)
-
-    private fun circleBitmap(circleColor: Int): Bitmap {
-        val bmp = Bitmap.createBitmap(31, 31, Bitmap.Config.ARGB_8888)
-        val cnv = Canvas(bmp)
-        cnv.drawCircle(
-            15f,
-            15f,
-            10f,
-            Paint().apply {
-                style = Paint.Style.FILL_AND_STROKE
-                strokeWidth = 6f
-                this.color = circleColor
-            })
-        return bmp
+@Composable
+private fun LocationInfo(loc: Location?) {
+    Row {
+        Text("Лок-я: ")
+        if (loc == null) {
+            Text("определяется...")
+        } else {
+            Text(loc.info())
+        }
     }
 }
+
+private fun Location.info() =
+    "${DMS(latitude).prettyFormat()} ${DMS(longitude).prettyFormat()} ${accuracy.round(1)}"
