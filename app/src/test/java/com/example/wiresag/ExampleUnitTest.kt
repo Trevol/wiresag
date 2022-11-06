@@ -1,5 +1,6 @@
 package com.example.wiresag
 
+import android.location.Location
 import com.example.wiresag.utils.*
 import org.junit.Test
 
@@ -10,7 +11,7 @@ import org.junit.Test
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
+    fun prettyFormat() {
         val latitude = 46.12373213
         val longitude = -23.12373213
 
@@ -22,4 +23,25 @@ class ExampleUnitTest {
             println(it)
         }
     }
+
+    @Test
+    fun distance() {
+
+        val latDelta = 0.003
+        val lonDelta = 0.001
+
+        val loc1 = Location("dummy").apply {
+            latitude = 46.12373213
+            longitude = 23.12373213
+        }
+
+        val loc12 = Location("dummy").apply {
+            latitude = loc1.latitude + latDelta
+            longitude = loc1.longitude + lonDelta
+        }
+
+        loc1.distanceTo(loc12).println()
+    }
 }
+
+private fun Any.println() = println(this)
