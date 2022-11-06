@@ -1,4 +1,23 @@
--
+- добавление опор
+    - маркер текущего положения и соотв. опоры не совпадают!!!!
+    - список опор (mutableStateList)
+    - слой для объектов
+    - как перерисовывать маркеры? Пока заново пересоздавать...
+- точки для фото
+    - виртуальные (в определенной ограниченной области вокруг текущего положения) и реальные (с фото)
+    - координаты
+    - ссылки на соотв. опоры
+    - mutableStateList
+    - формировать при добавлении опоры
+    - отрисовывать в слое с опорами
+- фото
+    - как сделать? с предпросмотром
+    - возвратом фото в приложение - файл? Объект?
+- разметка фото?
+- remember (in persistent storage) last received location. And use it on app start
+- button to place map on current location
+    - disabled if no current location yet
+- how to place element in arbitrary position on parent - bottom/left for example?
 
 +++ поворот устройства без пересоздания activity
 +++ start/stop consume events

@@ -25,6 +25,7 @@ import com.example.wiresag.ui.theme.WireSagTheme
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.utils.prettyFormat
+import com.example.wiresag.viewModel.WireSagViewModel
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 
 class WireSagActivity : ComponentActivity() {

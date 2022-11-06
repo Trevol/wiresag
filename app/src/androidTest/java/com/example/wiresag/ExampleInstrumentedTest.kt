@@ -25,8 +25,8 @@ class ExampleInstrumentedTest {
 
     @Test
     fun distance() {
-        val latDelta = 0.003
-        val lonDelta = 0.001
+        val latDelta = 0.000006
+        val lonDelta = 0.000007
 
         Location("dummy").apply {
             latitude = 46.12373213

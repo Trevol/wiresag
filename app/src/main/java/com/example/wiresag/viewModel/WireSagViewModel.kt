@@ -1,4 +1,4 @@
-package com.example.wiresag
+package com.example.wiresag.viewModel
 
 import android.content.Context
 import android.location.Location
@@ -12,8 +12,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
+import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
+import com.example.wiresag.model.Pylon
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.prettyFormat
 import com.example.wiresag.utils.round
@@ -27,6 +29,8 @@ class WireSagViewModel(
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private var prevLocation: Location? = null
+
+    val powerGrid = PowerGridViewModel()
 
     init {
         // Map not working without this line of code
@@ -57,8 +61,18 @@ class WireSagViewModel(
         val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
             map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
-        } else {
-            map.postInvalidate()
+        }
+
+        if (powerGrid.pylons != map.pylonsOverlay.items){
+            map.pylonsOverlay.removeAllItems()
+            map.pylonsOverlay.addItems(powerGrid.pylons.map { PylonOverlayItem(it) })
+        }
+        map.postInvalidate()
+    }
+
+    private fun addNewPylon() {
+        currentLocation?.run {
+            powerGrid.pylons.add(Pylon(latitude, longitude))
         }
     }
 
@@ -76,10 +90,10 @@ class WireSagViewModel(
                     modifier = Modifier.padding(start = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Button(onClick = { /*newMarker()*/ }) {
+                    Button(onClick = { addNewPylon() }, enabled = currentLocation != null) {
                         Text("О")
                     }
-                    Button(onClick = { /*clearMarkers()*/ }) {
+                    Button(onClick = { /*takePhoto()*/ }, enabled = currentLocation != null) {
                         Text("Ф")
                     }
                 }

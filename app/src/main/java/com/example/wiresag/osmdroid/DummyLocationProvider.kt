@@ -7,10 +7,11 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import kotlin.random.Random
 
 class DummyLocationProvider(
-    val latDelta: Double = 0.0003,
-    val lonDelta: Double = 0.0001,
+    val latDelta: Double = 0.000006,
+    val lonDelta: Double = 0.000007,
     val initialDelay: Long = 5000,
-    val initialLocation: Location? = dummyLocation()
+    val initialLocation: Location? = dummyLocation(),
+    val locationUpdateTime: Long = 1000
 ) : IMyLocationProvider {
 
     private var lastLocation = initialLocation
@@ -18,7 +19,7 @@ class DummyLocationProvider(
 
     override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
         stopLocationProvider()
-        job = GlobalScope.launch(Dispatchers.IO) {
+        job = CoroutineScope(Dispatchers.IO).launch {
             delay(initialDelay)
             while (true) {
                 val newLocation = lastLocation?.let {
@@ -29,10 +30,10 @@ class DummyLocationProvider(
                     }
                 } ?: dummyLocation()
                 lastLocation = newLocation
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     myLocationConsumer?.onLocationChanged(lastLocation, this@DummyLocationProvider)
                 }
-                delay(1000)
+                delay(locationUpdateTime)
             }
         }
         return true
