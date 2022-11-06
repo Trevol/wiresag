@@ -64,11 +64,9 @@ class WireSagViewModel(
 
     private fun updateMyLocation(newLocation: Location?) {
         val locationIsInitial = newLocation != null && myLocation == null
-        //Log.d("INFO-", "updateMyLocation. $locationIsInitial: $locationIsInitial $newLocation")
         myLocation = newLocation
         locationOverlay.setLocation(myLocation?.let { GeoPoint(it) })
         if (locationIsInitial) {
-            //mapInstance?.controller?.zoomTo(15.0)
             mapInstance?.controller?.animateTo(GeoPoint(myLocation!!), 15.0, null)
         } else {
             mapInstance?.postInvalidate()
@@ -77,7 +75,6 @@ class WireSagViewModel(
 
 
     private fun initMapView(map: MapView) {
-        Log.d("INFO-", "initMapView $map")
         mapInstance = map
         map.setMultiTouchControls(true)
         map.overlays.add(locationOverlay)
@@ -87,12 +84,11 @@ class WireSagViewModel(
             map.controller.setZoom(10.0)
         } else {
             map.controller.animateTo(GeoPoint(myLocation!!), 15.0, null)
-            //map.controller.zoomTo(12.0)
         }
     }
 
     private fun updateMapView(map: MapView) {
-        Log.d("INFO-", "updateMapView $map $myLocation")
+        myLocation
     }
 
     @Composable
