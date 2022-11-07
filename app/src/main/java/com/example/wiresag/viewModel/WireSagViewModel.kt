@@ -2,6 +2,7 @@ package com.example.wiresag.viewModel
 
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -16,6 +17,7 @@ import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
 import com.example.wiresag.model.Pylon
+import com.example.wiresag.osmdroid.enableScaleBar
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.prettyFormat
 import com.example.wiresag.utils.round
@@ -53,6 +55,10 @@ class WireSagViewModel(
     private fun updateMyLocation(newLocation: Location?) {
         prevLocation = currentLocation
         currentLocation = newLocation
+        Log.d(
+            "INFO-",
+            "currentLocation: ${currentLocation?.latitude}-${currentLocation?.longitude}"
+        )
     }
 
     private fun updateMapView(map: WireSagMapView) {
@@ -61,9 +67,10 @@ class WireSagViewModel(
         val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
             map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
+            prevLocation = currentLocation // animate only once!!!
         }
 
-        if (powerGrid.pylons != map.pylonsOverlay.items){
+        if (powerGrid.pylons != map.pylonsOverlay.items) {
             map.pylonsOverlay.removeAllItems()
             map.pylonsOverlay.addItems(powerGrid.pylons.map { PylonOverlayItem(it) })
         }
@@ -72,9 +79,10 @@ class WireSagViewModel(
 
     private fun addNewPylon() {
         currentLocation?.run {
-            powerGrid.pylons.add(Pylon(latitude, longitude))
+            powerGrid.createPylon(this)
         }
     }
+
 
     @Composable
     fun View() {
@@ -83,7 +91,10 @@ class WireSagViewModel(
             Box(modifier = Modifier.weight(1f)) {
                 WireSagMap(
                     modifier = Modifier.fillMaxSize(),
-                    onInitMapView = { it.controller.setZoom(15.0) },
+                    onInitMapView = {
+                        it.enableScaleBar()
+                        it.controller.setZoom(15.0)
+                    },
                     onUpdateMapView = ::updateMapView
                 )
                 Row(

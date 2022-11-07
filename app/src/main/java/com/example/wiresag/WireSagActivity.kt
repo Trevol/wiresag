@@ -43,7 +43,12 @@ class WireSagActivity : ComponentActivity() {
                 locationUpdateMinDistance = 0f
                 locationUpdateMinTime = 1000
             }*/
-        val locationProvider = DummyLocationProvider(initialLocation = null)
+        val locationProvider = DummyLocationProvider(
+            //initialLocation = null,
+            latDelta = 0.0,
+            initialDelay = 2000,
+            locationUpdateTime = 1000
+        )
 
         return WireSagViewModel(applicationContext, locationProvider)
     }

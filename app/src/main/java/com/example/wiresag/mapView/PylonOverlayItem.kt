@@ -5,4 +5,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.OverlayItem
 
 class PylonOverlayItem(val pylon: Pylon) :
-    OverlayItem(pylon.name, "", GeoPoint(pylon.latitude, pylon.longitude))
+    OverlayItem(pylon.name, "", GeoPoint(pylon.location)){
+        init {
+            markerHotspot = HotspotPlace.CENTER
+        }
+    }
