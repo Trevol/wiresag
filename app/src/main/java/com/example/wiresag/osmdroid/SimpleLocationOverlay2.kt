@@ -8,7 +8,8 @@ import org.osmdroid.views.overlay.mylocation.SimpleLocationOverlay
 
 class SimpleLocationOverlay2(theIcon: Bitmap) : SimpleLocationOverlay(theIcon) {
     init {
-        setPersonIcon(theIcon, Point(theIcon.width / 2, theIcon.height / 2))
+        //setPersonIcon(theIcon, Point(theIcon.width / 2, theIcon.height / 2))
+        PERSON_HOTSPOT = Point(theIcon.width / 2, theIcon.height / 2)
     }
 
     override fun draw(c: Canvas?, pj: Projection?) {

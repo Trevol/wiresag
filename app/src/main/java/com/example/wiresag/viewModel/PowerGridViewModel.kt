@@ -10,15 +10,6 @@ class PowerGridViewModel(
     val pylons: SnapshotStateList<Pylon> = mutableStateListOf()
 ) {
     fun createPylon(location: Location) {
-        /*val (nearestPylon, distToNearestPylon) = pylons.minByOrNullWithValue {
-            it.location.distanceTo(
-                location
-            )
-        }
-        if (nearestPylon == null || distToNearestPylon == null || distToNearestPylon > PYLON_DISTANCE_THRESHOLD) {
-            pylons.add(Pylon(location))
-        }*/
-
         val distToNearestPylon = pylons.minOfOrNull { it.location.distanceTo(location) }
         if (distToNearestPylon == null || distToNearestPylon > PYLON_DISTANCE_THRESHOLD) {
             pylons.add(Pylon(location))
