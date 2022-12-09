@@ -1,12 +1,8 @@
 package com.example.wiresag.mapView
 
 import com.example.wiresag.model.Pylon
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.overlay.OverlayItem
+import com.example.wiresag.osmdroid.toGeoPoint
 
 class PylonOverlayItem(val pylon: Pylon) :
-    OverlayItem(pylon.name, "", GeoPoint(pylon.location)){
-        init {
-            markerHotspot = HotspotPlace.CENTER
-        }
-    }
+    CenteredOverlayItem(pylon.name, pylon.location.toGeoPoint())
+

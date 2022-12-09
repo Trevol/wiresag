@@ -17,6 +17,6 @@ class PowerGridViewModel(
     }
 
     companion object {
-        const val PYLON_DISTANCE_THRESHOLD = 5f
+        const val PYLON_DISTANCE_THRESHOLD = 3f
     }
 }

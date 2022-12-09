@@ -8,7 +8,7 @@ import org.osmdroid.views.overlay.OverlayItem
 class ItemizedIconOverlay2<Item : OverlayItem>(
     items: List<Item>,
     defaultMarker: Drawable,
-    onItemGestureListener: OnItemGestureListener<Item>,
+    onItemGestureListener: OnItemGestureListener<Item>?,
     context: Context
 ) : ItemizedIconOverlay<Item>(items, defaultMarker, onItemGestureListener, context) {
     val items get() = mItemList

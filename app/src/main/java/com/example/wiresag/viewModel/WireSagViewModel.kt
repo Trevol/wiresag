@@ -13,14 +13,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
+import com.example.wiresag.mapView.CenteredOverlayItem
 import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.model.Pylon
+import com.example.wiresag.osmdroid.enableRotationGesture
 import com.example.wiresag.osmdroid.enableScaleBar
-import com.example.wiresag.utils.DMS
-import com.example.wiresag.utils.prettyFormat
-import com.example.wiresag.utils.round
+import com.example.wiresag.osmdroid.toGeoPoint
+import com.example.wiresag.utils.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -55,10 +55,6 @@ class WireSagViewModel(
     private fun updateMyLocation(newLocation: Location?) {
         prevLocation = currentLocation
         currentLocation = newLocation
-        Log.d(
-            "INFO-",
-            "currentLocation: ${currentLocation?.latitude}-${currentLocation?.longitude}"
-        )
     }
 
     private fun updateMapView(map: WireSagMapView) {
@@ -70,9 +66,12 @@ class WireSagViewModel(
             prevLocation = currentLocation // animate only once!!!
         }
 
-        if (powerGrid.pylons != map.pylonsOverlay.items) {
+        val pylonsOnLayer = map.pylonsOverlay.items.map { it.pylon }
+        if (powerGrid.pylons.toList() != pylonsOnLayer) {
             map.pylonsOverlay.removeAllItems()
-            map.pylonsOverlay.addItems(powerGrid.pylons.map { PylonOverlayItem(it) })
+            map.pylonsOverlay.addItems(
+                powerGrid.pylons.map { PylonOverlayItem(it) }
+            )
         }
         map.postInvalidate()
     }
@@ -92,7 +91,6 @@ class WireSagViewModel(
                 WireSagMap(
                     modifier = Modifier.fillMaxSize(),
                     onInitMapView = {
-                        it.enableScaleBar()
                         it.controller.setZoom(15.0)
                     },
                     onUpdateMapView = ::updateMapView
@@ -130,5 +128,11 @@ private fun LocationInfo(loc: Location?) {
     }
 }
 
-private fun Location.info() =
-    "${DMS(latitude).prettyFormat()} ${DMS(longitude).prettyFormat()} ${accuracy.round(1)}"
+private fun Location.info(): String {
+    val speedInfo = if (hasSpeed()) speed.round(3) else ""
+    return "$provider ${DMS(latitude).prettyFormat()} ${DMS(longitude).prettyFormat()} ${
+        accuracy.round(
+            1
+        )
+    } $speedInfo"
+}

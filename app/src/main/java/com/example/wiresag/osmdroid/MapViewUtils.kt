@@ -1,6 +1,8 @@
 package com.example.wiresag.osmdroid
 
 import android.graphics.Bitmap
+import android.location.Location
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MinimapOverlay
 import org.osmdroid.views.overlay.ScaleBarOverlay
@@ -60,3 +62,5 @@ fun MapView.enableRotationGesture(): MapView {
     }.also { overlays.add(it) }
     return this
 }
+
+inline fun Location.toGeoPoint() = GeoPoint(this)
