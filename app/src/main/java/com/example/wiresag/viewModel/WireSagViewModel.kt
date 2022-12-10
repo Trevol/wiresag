@@ -54,7 +54,8 @@ class WireSagViewModel(
     }
 
     private fun updateMapView(map: WireSagMapView) {
-        map.locationOverlay.setLocation(currentLocation?.let { GeoPoint(it) })
+
+        map.overlay.location.setLocation(currentLocation?.let { GeoPoint(it) })
 
         val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
@@ -62,18 +63,18 @@ class WireSagViewModel(
             prevLocation = currentLocation // animate only once!!!
         }
 
-        val pylonsOnLayer = map.pylonsOverlay.items.map { it.pylon }
+        val pylonsOnLayer = map.overlay.pylons.items.map { it.pylon }
         if (geoObjects.pylons.toList() != pylonsOnLayer) {
-            map.pylonsOverlay.removeAllItems()
-            map.pylonsOverlay.addItems(
+            map.overlay.pylons.removeAllItems()
+            map.overlay.pylons.addItems(
                 geoObjects.pylons.map { PylonOverlayItem(it) }
             )
         }
 
-        val photoPlacesOnLayer = map.photoPointsOverlay.items.map { it.point }
+        val photoPlacesOnLayer = map.overlay.photoPoints.items.map { it.point }
         if (geoObjects.photoPlaces.toList() != photoPlacesOnLayer) {
-            map.photoPointsOverlay.removeAllItems()
-            map.photoPointsOverlay.addItems(
+            map.overlay.photoPoints.removeAllItems()
+            map.overlay.photoPoints.addItems(
                 geoObjects.photoPlaces.map { CenteredOverlayItem(geoPoint = it) }
             )
         }

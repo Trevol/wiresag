@@ -14,27 +14,31 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ItemizedIconOverlay
 
 class WireSagMapView(context: Context) : MapView(context) {
-    val locationOverlay = SimpleLocationOverlay2(MapViewMarker.location)
-        .also { overlays.add(it) }
-
-    val pylonsOverlay = ItemizedIconOverlay2(
-        mutableListOf<PylonOverlayItem>(),
-        MapViewMarker.pylon.toDrawable(Resources.getSystem()),
-        null,
-        context
-    ).also { overlays.add(it) }
-
-    val photoPointsOverlay = ItemizedIconOverlay2(
-        mutableListOf<CenteredOverlayItem>(),
-        MapViewMarker.photoPlace.toDrawable(Resources.getSystem()),
-        null,
-        context
-    ).also { overlays.add(it) }
+    val overlay = Overlays(this)
 
     init {
         setMultiTouchControls(true)
         enableScaleBar()
         enableRotationGesture()
+    }
+
+    class Overlays(map: WireSagMapView) {
+        val location = SimpleLocationOverlay2(MapViewMarker.location)
+            .also { map.overlays.add(it) }
+
+        val pylons = ItemizedIconOverlay2(
+            mutableListOf<PylonOverlayItem>(),
+            MapViewMarker.pylon.toDrawable(Resources.getSystem()),
+            null,
+            map.context
+        ).also { map.overlays.add(it) }
+
+        val photoPoints = ItemizedIconOverlay2(
+            mutableListOf<CenteredOverlayItem>(),
+            MapViewMarker.photoPlace.toDrawable(Resources.getSystem()),
+            null,
+            map.context
+        ).also { map.overlays.add(it) }
     }
 }
 
