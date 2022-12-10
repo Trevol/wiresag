@@ -67,7 +67,7 @@ class WireSagActivity : ComponentActivity() {
             this,
             getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: File(filesDir, "Pictures")
                 .also { it.mkdirs() },
-            "sample_authority"
+            "wiresag_authority"
         )
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         //window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

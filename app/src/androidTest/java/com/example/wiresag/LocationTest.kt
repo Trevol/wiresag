@@ -1,74 +1,67 @@
 package com.example.wiresag
 
-import android.location.Location
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.wiresag.location.toLocation
+import com.example.wiresag.location.toLocationRadians
+import com.example.wiresag.math.PointsAtDistanceToLineSegmentMidpoint
+import com.example.wiresag.math.geo.Earth
+import com.example.wiresag.math.invoke
 import com.example.wiresag.utils.*
-
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
-
 
 @RunWith(AndroidJUnit4::class)
 class LocationTest {
     @Test
-    fun selfComputedDistance() {
-        val latDelta = 0.00006
-        val lonDelta = 0.0006
-
-        listOf(
-            Location(0.0, 0.12),
-            Location(45.0, 23.12),
-            Location(-89.0, 23.12),
-            /*Location(89.0, 43.12),
-
-            Location(89.9, 23.12),
-            Location(89.9, 43.12),
-
-            Location(46.12373213, 23.12373213),
-            Location(0.12373213, -10.12373213)*/
-        )
-            .map {
-                //it.plus(latDelta, 0.0).distanceTo(it) to it.plus(0.0, lonDelta).distanceTo(it)
-                val other = it.plus(latDelta, lonDelta)
-                other.distanceTo(it) to other.bigCircleDistanceTo(it)
-            }
-            .forEach { it.println("DIST") }
-    }
-
-    @Test
-    fun midpointTest() {
-
-        fun Location.toDisplayString() =
-            "$latitude, $longitude (${DMS(latitude).prettyFormat()}, ${DMS(longitude).prettyFormat()})"
-
-        val latDelta = 0.0003
-        val lonDelta = 0.0014
-
-        listOf(
-            Location(0.0, 0.0) to Location(0.0, 2.0),
-            Location(0.0, 0.0) to Location(2.0, 0.0),
-            Location(46.0, 23.0) to Location(46.5, 23.8),
-            Location(46.5, 23.8) to Location(46.0, 23.0),
-            Location(46.5, 23.0) to Location(46.5, 23.8),
-
-            Location(46.5, 23.0).let { it to it.plus(latDelta, lonDelta) }
-        ).map { (p1, p2) ->
-            val mp1 = p1.midpoint(p2)
-            val mp2 = p1.soSimplifiedMidpoint(p2)
-            Triple(mp1, mp2, p1.distanceTo(p2) to mp1.distanceTo(mp2))
-
-        }.forEach { (mp1, mp2, distances) ->
-            mp1.toDisplayString().println("1")
-            mp2.toDisplayString().println("2")
-            distances.println("D")
-            "------".println()
-        }
-    }
-
-    @Test
     fun out() {
+        val angularDistToSpan = 20.0 / Earth.r
+        val locationsWithDistToSpan =
+            PointsAtDistanceToLineSegmentMidpoint(angularDistanceToMidpoint = angularDistToSpan)
+
+        val spans = listOf(
+            Location(45.0, 23.0) to Location(45.0, 23.00078),
+            Location(45.0, 23.00078) to Location(45.0, 23.0),
+
+            Location(45.0, 23.0) to Location(45.00078, 23.0),
+            Location(45.00078, 23.0) to Location(45.0, 23.0),
+
+            Location(45.0, 23.0) to Location(45.00078, 23.00078),
+            Location(45.00078, 23.00078) to Location(45.0, 23.0),
+
+            Location(45 - 0.00078, 23.0) to Location(45.00078, 23.00078),
+            Location(45.00078, 23.00078) to Location(45 - 0.00078, 23.0),
+
+            // Location(45.0, 23.0) to Location(45.0078, 23.0078)
+        )
+
+        spans.forEach { (pylon1, pylon2) ->
+            val segment = pylon1.toLocationRadians() to pylon2.toLocationRadians()
+
+            val result = locationsWithDistToSpan.extendedInvoke(segment)
+
+            PointsAtDistanceToLineSegmentMidpoint.Check.points(
+                result.points,
+                result.segmentIn2D,
+                angularDistToSpan
+            )
+            PointsAtDistanceToLineSegmentMidpoint.Check.locations(
+                result.locations,
+                segment,
+                angularDistToSpan
+            )
+
+            val resultAsLocations = locationsWithDistToSpan(pylon1 to pylon2)
+
+            PointsAtDistanceToLineSegmentMidpoint.Check.locations(
+                resultAsLocations.map { it.toLocationRadians() },
+                segment,
+                angularDistToSpan
+            )
+
+            val (n1, n2) = result.locations.toList().map { it.toLocation() }
+            "DistTo: ${n1.distanceTo(n2)}".println()
+        }
 
     }
 }
