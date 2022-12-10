@@ -24,6 +24,13 @@ class WireSagMapView(context: Context) : MapView(context) {
         context
     ).also { overlays.add(it) }
 
+    val photoPointsOverlay = ItemizedIconOverlay2(
+        mutableListOf<CenteredOverlayItem>(),
+        MapViewMarker.photoPlace.toDrawable(Resources.getSystem()),
+        null,
+        context
+    ).also { overlays.add(it) }
+
     init {
         setMultiTouchControls(true)
         enableScaleBar()

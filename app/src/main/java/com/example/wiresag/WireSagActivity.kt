@@ -44,7 +44,7 @@ class WireSagActivity : ComponentActivity() {
             //initialLocation = null,
             //latDelta = 0.0,
             initialDelay = 1000,
-            locationUpdateTime = 1000
+            locationUpdateTime = 500
         )
 
         return WireSagViewModel(applicationContext, locationProvider)

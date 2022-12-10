@@ -11,6 +11,7 @@ import kotlin.math.ceil
 
 object MapViewMarker {
     val pylon = circleBitmap(Color.argb(127, 0, 0, 255))
+    val photoPlace = circleBitmap(Color.argb(200, 255, 255, 0))
     val location = circleBitmap(Color.GREEN)
 
     private fun circleBitmap(circleColor: Int, radius: Float = 15f): Bitmap {

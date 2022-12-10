@@ -2,7 +2,6 @@ package com.example.wiresag.viewModel
 
 import android.content.Context
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -17,9 +16,6 @@ import com.example.wiresag.mapView.CenteredOverlayItem
 import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.osmdroid.enableRotationGesture
-import com.example.wiresag.osmdroid.enableScaleBar
-import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.utils.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -32,7 +28,7 @@ class WireSagViewModel(
     private var currentLocation by mutableStateOf(null as Location?)
     private var prevLocation: Location? = null
 
-    val powerGrid = PowerGridViewModel()
+    val geoObjects = GeoObjectsViewModel()
 
     init {
         // Map not working without this line of code
@@ -67,18 +63,27 @@ class WireSagViewModel(
         }
 
         val pylonsOnLayer = map.pylonsOverlay.items.map { it.pylon }
-        if (powerGrid.pylons.toList() != pylonsOnLayer) {
+        if (geoObjects.pylons.toList() != pylonsOnLayer) {
             map.pylonsOverlay.removeAllItems()
             map.pylonsOverlay.addItems(
-                powerGrid.pylons.map { PylonOverlayItem(it) }
+                geoObjects.pylons.map { PylonOverlayItem(it) }
             )
         }
+
+        val photoPlacesOnLayer = map.photoPointsOverlay.items.map { it.point }
+        if (geoObjects.photoPlaces.toList() != photoPlacesOnLayer) {
+            map.photoPointsOverlay.removeAllItems()
+            map.photoPointsOverlay.addItems(
+                geoObjects.photoPlaces.map { CenteredOverlayItem(geoPoint = it) }
+            )
+        }
+
         map.postInvalidate()
     }
 
-    private fun addNewPylon() {
+    private fun markPylon() {
         currentLocation?.run {
-            powerGrid.createPylon(this)
+            geoObjects.markPylon(this)
         }
     }
 
@@ -99,7 +104,7 @@ class WireSagViewModel(
                     modifier = Modifier.padding(start = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Button(onClick = { addNewPylon() }, enabled = currentLocation != null) {
+                    Button(onClick = { markPylon() }, enabled = currentLocation != null) {
                         Text("О")
                     }
                     Button(onClick = { /*takePhoto()*/ }, enabled = currentLocation != null) {
