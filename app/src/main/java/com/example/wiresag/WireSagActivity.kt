@@ -34,32 +34,28 @@ class WireSagActivity : ComponentActivity() {
     )
 
     private fun createWireSagViewModel(): WireSagViewModel {
-        /*val locationProvider = GpsMyLocationProvider(applicationContext)
+        val locationProvider = GpsMyLocationProvider(applicationContext)
             .apply {
                 locationUpdateMinDistance = 1f
                 locationUpdateMinTime = 500
-            }*/
+            }
 
-        val locationProvider = DummyLocationProvider(
+        /*val locationProvider = DummyLocationProvider(
             //initialLocation = null,
             //latDelta = 0.0,
             initialDelay = 1000,
             locationUpdateTime = 500
-        )
+        )*/
 
-        return WireSagViewModel(applicationContext, locationProvider)
+        return WireSagViewModel(applicationContext,
+            locationProvider,
+            requestPhoto = { photo ->
+                photoRequest.takePhoto { photo(it) }
+            })
     }
 
-    var picture by mutableStateOf<Bitmap?>(null)
+
     lateinit var photoRequest: CameraPhotoRequest
-
-    private fun takePhoto() {
-        photoRequest.takePhoto {
-            if (it != null) {
-                picture = it
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

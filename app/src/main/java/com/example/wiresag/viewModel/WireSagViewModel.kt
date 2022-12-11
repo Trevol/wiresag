@@ -1,6 +1,7 @@
 package com.example.wiresag.viewModel
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -23,12 +24,15 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 class WireSagViewModel(
     applicationContext: Context,
-    private val locationProvider: IMyLocationProvider
+    private val locationProvider: IMyLocationProvider,
+    private val requestPhoto: ((Bitmap?) -> Unit) -> Unit
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private var prevLocation: Location? = null
 
     val geoObjects = GeoObjectsViewModel()
+
+    var picture by mutableStateOf<Bitmap?>(null)
 
     init {
         // Map not working without this line of code
@@ -72,10 +76,10 @@ class WireSagViewModel(
         }
 
         val photoPlacesOnLayer = map.overlay.photoPoints.items.map { it.point }
-        if (geoObjects.photoPlaces.toList() != photoPlacesOnLayer) {
+        if (geoObjects.placesForPhoto.toList() != photoPlacesOnLayer) {
             map.overlay.photoPoints.removeAllItems()
             map.overlay.photoPoints.addItems(
-                geoObjects.photoPlaces.map { CenteredOverlayItem(geoPoint = it) }
+                geoObjects.placesForPhoto.map { CenteredOverlayItem(geoPoint = it) }
             )
         }
 
@@ -88,6 +92,11 @@ class WireSagViewModel(
         }
     }
 
+    private fun takePhoto() {
+        requestPhoto { photo ->
+
+        }
+    }
 
     @Composable
     fun View() {
@@ -108,7 +117,7 @@ class WireSagViewModel(
                     Button(onClick = { markPylon() }, enabled = currentLocation != null) {
                         Text("О")
                     }
-                    Button(onClick = { /*takePhoto()*/ }, enabled = currentLocation != null) {
+                    Button(onClick = { takePhoto() }, enabled = currentLocation != null) {
                         Text("Ф")
                     }
                 }

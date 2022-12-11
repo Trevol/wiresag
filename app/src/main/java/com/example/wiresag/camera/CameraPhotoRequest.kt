@@ -30,7 +30,7 @@ class CameraPhotoRequest(
     }
 }
 
-fun ActivityResultCaller.registerTakePictureAction(): (uri: Uri, result: (taken: Boolean) -> Unit) -> Unit {
+private fun ActivityResultCaller.registerTakePictureAction(): (uri: Uri, result: (taken: Boolean) -> Unit) -> Unit {
     var resultCallback: (Boolean) -> Unit = {}
     val launcher = registerForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
         resultCallback(taken)

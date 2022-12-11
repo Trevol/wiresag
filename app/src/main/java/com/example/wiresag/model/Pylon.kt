@@ -1,8 +1,8 @@
 package com.example.wiresag.model
 
-import android.location.Location
 import com.example.wiresag.utils.DMS
+import org.osmdroid.util.GeoPoint
 
-class Pylon(val location: Location) {
-    val name = "Опора ${DMS(location.latitude)}/${DMS(location.longitude)}"
+class Pylon(val geoPoint: GeoPoint) {
+    val name = "Опора ${DMS(geoPoint.latitude)}/${DMS(geoPoint.longitude)}"
 }

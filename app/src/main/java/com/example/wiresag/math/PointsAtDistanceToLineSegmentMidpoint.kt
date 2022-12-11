@@ -9,6 +9,7 @@ import math.*
 import com.example.wiresag.math.geo.centralAngle
 import com.example.wiresag.math.geo.midpoint
 import com.example.wiresag.utils.map
+import org.osmdroid.api.IGeoPoint
 import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.cos
@@ -161,5 +162,10 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistanceToMidpoint: Doubl
 }
 
 operator fun PointsAtDistanceToLineSegmentMidpoint.invoke(segment: Pair<Location, Location>) =
+    this(segment.map { it.toLocationRadians() })
+        .map { it.toLocation() }
+
+@JvmName("invokeGeoPoint")
+operator fun PointsAtDistanceToLineSegmentMidpoint.invoke(segment: Pair<IGeoPoint, IGeoPoint>) =
     this(segment.map { it.toLocationRadians() })
         .map { it.toLocation() }
