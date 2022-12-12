@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.CenteredOverlayItem
@@ -115,16 +116,20 @@ class WireSagViewModel(
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
 
-                WireSagMap(
-                    modifier = Modifier.fillMaxSize(),
-                    onInitMapView = {
-                        it.controller.setZoom(15.0)
-                    },
-                    onUpdateMapView = ::updateMapView
-                )
+                if (editablePhoto != null) {
+                    ImageAnnotationTool(
+                        image = editablePhoto!!,
+                        onClose = { editablePhoto = null },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(2f)
+                    )
+                }
 
                 Row(
-                    modifier = Modifier.padding(start = 20.dp),
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .zIndex(1f),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     Button(onClick = { markPylon() }, enabled = currentLocation != null) {
@@ -138,13 +143,13 @@ class WireSagViewModel(
                     }
                 }
 
-                editablePhoto?.let {
-                    ImageAnnotationTool(
-                        image = it,
-                        onClose = { editablePhoto = null },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                WireSagMap(
+                    modifier = Modifier.fillMaxSize(),
+                    onInitMapView = {
+                        it.controller.setZoom(15.0)
+                    },
+                    onUpdateMapView = ::updateMapView
+                )
 
             }
             Box() {

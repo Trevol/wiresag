@@ -3,6 +3,8 @@ package com.example.wiresag.ui.image.annotation
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -12,21 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.zIndex
 import com.example.wiresag.R
 
 @Composable
 fun ImageAnnotationTool(image: Bitmap, onClose: () -> Unit, modifier: Modifier) {
     BackHandler(onBack = { onClose() })
-
-    Image(
-        image.asImageBitmap(),
-        contentDescription = "",
-        modifier = modifier,
-        contentScale = ContentScale.Crop
-    )
-
-    FloatingActionButton(onClick = { onClose() }) {
-        Icon(Icons.Outlined.ArrowBack, stringResource(R.string.back))
+    Box(modifier = modifier) {
+        FloatingActionButton(onClick = { onClose() }, modifier = Modifier.zIndex(1f)) {
+            Icon(Icons.Outlined.ArrowBack, stringResource(R.string.back))
+        }
+        Image(
+            image.asImageBitmap(),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
     }
 
 }
