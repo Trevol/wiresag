@@ -1,24 +1,20 @@
 package com.example.wiresag
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.example.wiresag.camera.CameraPhotoRequest
 import com.example.wiresag.osmdroid.DummyLocationProvider
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.WireSagViewModel
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
 class WireSagActivity : ComponentActivity() {
@@ -33,38 +29,14 @@ class WireSagActivity : ComponentActivity() {
         // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
     )
 
-    private fun createWireSagViewModel(): WireSagViewModel {
-        val locationProvider = GpsMyLocationProvider(applicationContext)
-            .apply {
-                locationUpdateMinDistance = 1f
-                locationUpdateMinTime = 500
-            }
-
-        /*val locationProvider = DummyLocationProvider(
-            //initialLocation = null,
-            //latDelta = 0.0,
-            initialDelay = 1000,
-            locationUpdateTime = 500
-        )*/
-
-        return WireSagViewModel(applicationContext,
-            locationProvider,
-            requestPhoto = { photo ->
-                photoRequest.takePhoto { photo(it) }
-            })
-    }
-
-
-    lateinit var photoRequest: CameraPhotoRequest
+    private lateinit var services: Services
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        photoRequest = CameraPhotoRequest(
-            this,
-            getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: File(filesDir, "Pictures")
-                .also { it.mkdirs() },
-            "wiresag_authority"
-        )
+
+        services = Services(this)
+
+
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         //window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -73,7 +45,7 @@ class WireSagActivity : ComponentActivity() {
         permissionsRequest().launch { granted ->
             setContent {
                 if (granted) {
-                    val viewModel = remember { createWireSagViewModel() }
+                    val viewModel = remember { services.viewModel() }
                     Main { viewModel.View() }
                 } else {
                     NoPermissions()
@@ -81,5 +53,36 @@ class WireSagActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    private class Services(val context: ComponentActivity) {
+        val photoRequest = CameraPhotoRequest(
+            context,
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: File(
+                context.filesDir,
+                "Pictures"
+            )
+                .also { it.mkdirs() },
+            "wiresag_authority"
+        )
+
+        private fun locationProvider(): IMyLocationProvider {
+            /*val locationProvider = GpsMyLocationProvider(applicationContext)
+                    .apply {
+                        locationUpdateMinDistance = 0.001f
+                        locationUpdateMinTime = 500
+                    }*/
+
+            val locationProvider = DummyLocationProvider(
+                //initialLocation = null,
+                //latDelta = 0.0,
+                initialDelay = 1000,
+                locationUpdateTime = 500
+            )
+            return locationProvider
+        }
+
+
+        fun viewModel() = WireSagViewModel(context, locationProvider(), photoRequest)
     }
 }

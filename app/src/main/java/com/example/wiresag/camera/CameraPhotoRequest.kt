@@ -9,15 +9,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import java.io.File
 
+interface PhotoRequest {
+    fun takePhoto(photo: (Bitmap?) -> Unit)
+}
+
 class CameraPhotoRequest(
     val context: ComponentActivity,
     val imagesDirectory: File,
     val authority: String,
     val tmpFilePrefix: () -> String = { "tmp_" }
-) {
+) : PhotoRequest {
     val action = context.registerTakePictureAction()
 
-    fun takePhoto(photo: (Bitmap?) -> Unit) {
+    override fun takePhoto(photo: (Bitmap?) -> Unit) {
         val imageFile = File.createTempFile(tmpFilePrefix(), ".jpg", imagesDirectory)
         action(FileProvider.getUriForFile(context, authority, imageFile)) { taken ->
             val bmp = if (taken) {

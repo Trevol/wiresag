@@ -13,11 +13,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
+import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.CenteredOverlayItem
 import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.utils.*
+import com.example.wiresag.model.PhotoWithGeoPoint
+import com.example.wiresag.osmdroid.toGeoPoint
+import com.example.wiresag.ui.image.annotation.ImageAnnotationTool
+import com.example.wiresag.utils.DMS
+import com.example.wiresag.utils.prettyFormat
+import com.example.wiresag.utils.round
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -25,14 +31,12 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 class WireSagViewModel(
     applicationContext: Context,
     private val locationProvider: IMyLocationProvider,
-    private val requestPhoto: ((Bitmap?) -> Unit) -> Unit
+    private val photoRequest: PhotoRequest
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private var prevLocation: Location? = null
-
-    val geoObjects = GeoObjectsViewModel()
-
-    var picture by mutableStateOf<Bitmap?>(null)
+    private val geoObjects = GeoObjectsViewModel()
+    private var editablePhoto by mutableStateOf(null as Bitmap?)
 
     init {
         // Map not working without this line of code
@@ -92,17 +96,25 @@ class WireSagViewModel(
         }
     }
 
-    private fun takePhoto() {
-        requestPhoto { photo ->
-
+    private fun takePhotoWithLocation() {
+        if (currentLocation == null) {
+            return
+        }
+        photoRequest.takePhoto { photo ->
+            if (photo == null) {
+                return@takePhoto
+            }
+            val location = currentLocation ?: return@takePhoto
+            geoObjects.photos.add(PhotoWithGeoPoint(photo, location.toGeoPoint()))
+            editablePhoto = photo
         }
     }
 
     @Composable
     fun View() {
         Column(modifier = Modifier.fillMaxSize()) {
-
             Box(modifier = Modifier.weight(1f)) {
+
                 WireSagMap(
                     modifier = Modifier.fillMaxSize(),
                     onInitMapView = {
@@ -110,6 +122,7 @@ class WireSagViewModel(
                     },
                     onUpdateMapView = ::updateMapView
                 )
+
                 Row(
                     modifier = Modifier.padding(start = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -117,9 +130,20 @@ class WireSagViewModel(
                     Button(onClick = { markPylon() }, enabled = currentLocation != null) {
                         Text("О")
                     }
-                    Button(onClick = { takePhoto() }, enabled = currentLocation != null) {
+                    Button(
+                        onClick = { takePhotoWithLocation() },
+                        enabled = currentLocation != null
+                    ) {
                         Text("Ф")
                     }
+                }
+
+                editablePhoto?.let {
+                    ImageAnnotationTool(
+                        image = it,
+                        onClose = { editablePhoto = null },
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
 
             }
