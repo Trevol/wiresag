@@ -3,6 +3,7 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -111,21 +112,21 @@ class WireSagViewModel(
         }
     }
 
+    @ExperimentalFoundationApi
     @Composable
     fun View() {
         Column(modifier = Modifier.fillMaxSize()) {
+            if (editablePhoto != null) {
+                ImageAnnotationTool(
+                    image = editablePhoto!!,
+                    onClose = { editablePhoto = null },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(2f)
+                )
+            }
+
             Box(modifier = Modifier.weight(1f)) {
-
-                if (editablePhoto != null) {
-                    ImageAnnotationTool(
-                        image = editablePhoto!!,
-                        onClose = { editablePhoto = null },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .zIndex(2f)
-                    )
-                }
-
                 Row(
                     modifier = Modifier
                         .padding(start = 20.dp)
@@ -150,6 +151,7 @@ class WireSagViewModel(
                     },
                     onUpdateMapView = ::updateMapView
                 )
+
 
             }
             Box() {

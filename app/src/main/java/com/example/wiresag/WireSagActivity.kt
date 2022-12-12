@@ -6,6 +6,7 @@ import android.os.Environment
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.remember
 import com.example.wiresag.camera.CameraPhotoRequest
@@ -31,6 +32,7 @@ class WireSagActivity : ComponentActivity() {
 
     private lateinit var services: Services
 
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
