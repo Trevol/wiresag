@@ -1,4 +1,4 @@
-package com.example.wiresag.ui
+package com.example.wiresag.ui.image
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
