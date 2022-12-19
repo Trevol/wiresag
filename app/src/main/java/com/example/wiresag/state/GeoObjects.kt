@@ -8,6 +8,7 @@ import com.example.wiresag.math.PointsAtDistanceToLineSegmentMidpoint
 import com.example.wiresag.math.geo.Earth
 import com.example.wiresag.math.invoke
 import com.example.wiresag.osmdroid.toGeoPoint
+import com.example.wiresag.utils.addItem
 import com.example.wiresag.utils.map
 import org.osmdroid.api.IGeoPoint
 import org.osmdroid.util.GeoPoint
@@ -28,9 +29,12 @@ class GeoObjects {
             ?: Double.POSITIVE_INFINITY
         if (distanceToNearestPylon <= PylonDistanceThreshold) return
 
-        val thisPylon = Pylon(geoPoint).also { pylons.add(it) }
+        val thisPylon = pylons.addItem(Pylon(geoPoint))
         if (pylons.size > 1) {
-            spans.add(WireSpan(thisPylon, pylons[pylons.lastIndex - 1]))
+            val otherPylon = pylons[pylons.lastIndex - 1]
+            val span = spans.addItem(WireSpan(thisPylon, otherPylon))
+            thisPylon.spans.add(span)
+            otherPylon.spans.add(span)
         }
     }
 

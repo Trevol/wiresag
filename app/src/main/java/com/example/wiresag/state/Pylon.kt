@@ -16,7 +16,15 @@ import kotlin.math.acos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Pylon(val geoPoint: GeoPoint) {
+interface GeoPointAware {
+    val geoPoint: GeoPoint
+}
+
+fun <T : GeoPointAware> List<T>.nearest(): T {
+    TODO()
+}
+
+data class Pylon(override val geoPoint: GeoPoint) : GeoPointAware {
     val name = "Опора ${DMS(geoPoint.latitude)}/${DMS(geoPoint.longitude)}"
     val spans: MutableList<WireSpan> = mutableStateListOf()
 }
@@ -24,9 +32,10 @@ class Pylon(val geoPoint: GeoPoint) {
 data class WireSpan(
     val pylon1: Pylon,
     val pylon2: Pylon
-) {
+) : GeoPointAware {
     val length by lazy { pylon1.geoPoint.distanceToAsDouble(pylon2.geoPoint).toFloat() }
     val midpoint by lazy { pylon1.geoPoint.midpoint(pylon2.geoPoint) }
+    override val geoPoint: GeoPoint get() = midpoint
     val photos = mutableStateListOf<WireSpanPhoto>()
     val placesForPhoto = derivedStateOf {
         photoPlacesSolver(pylon1.geoPoint, pylon2.geoPoint).map { it.toGeoPoint() }
