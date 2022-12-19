@@ -1,7 +1,6 @@
 package com.example.wiresag.viewModel
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.location.Location
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -20,9 +19,11 @@ import com.example.wiresag.mapView.CenteredOverlayItem
 import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.model.PhotoWithGeoPoint
+import com.example.wiresag.state.WireSpanPhoto
+import com.example.wiresag.state.PhotoWithGeoPoint
 import com.example.wiresag.osmdroid.toGeoPoint
-import com.example.wiresag.ui.image.annotation.ImageAnnotationTool
+import com.example.wiresag.state.GeoObjects
+import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.prettyFormat
 import com.example.wiresag.utils.round
@@ -37,8 +38,8 @@ class WireSagViewModel(
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private var prevLocation: Location? = null
-    private val geoObjects = GeoObjectsViewModel()
-    private var editablePhoto by mutableStateOf(null as Bitmap?)
+    private val geoObjects = GeoObjects()
+    private var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
 
     init {
         // Map not working without this line of code
@@ -94,7 +95,7 @@ class WireSagViewModel(
 
     private fun markPylon() {
         currentLocation?.run {
-            geoObjects.markPylon(this)
+            geoObjects.markPylon(toGeoPoint())
         }
     }
 
@@ -106,9 +107,11 @@ class WireSagViewModel(
             if (photo == null) {
                 return@takePhoto
             }
-            val location = currentLocation ?: return@takePhoto
-            geoObjects.photos.add(PhotoWithGeoPoint(photo, location.toGeoPoint()))
-            editablePhoto = photo
+            val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
+            val photoWithGeoPoint = PhotoWithGeoPoint(photo, currentGeoPoint)
+            geoObjects.photos.add(photoWithGeoPoint)
+            TODO()
+            //photoForAnnotation = WireSpanPhoto(pylon1, pylon2, photoWithGeoPoint)
         }
     }
 
@@ -116,13 +119,13 @@ class WireSagViewModel(
     @Composable
     fun View() {
         Column(modifier = Modifier.fillMaxSize()) {
-            if (editablePhoto != null) {
-                ImageAnnotationTool(
-                    image = editablePhoto!!,
-                    onClose = { editablePhoto = null },
+            if (photoForAnnotation != null) {
+                WireSagAnnotationTool(
                     modifier = Modifier
                         .fillMaxSize()
-                        .zIndex(2f)
+                        .zIndex(2f),
+                    wireSpanPhoto = photoForAnnotation!!,
+                    onClose = { photoForAnnotation = null }
                 )
             }
 
@@ -138,7 +141,7 @@ class WireSagViewModel(
                     }
                     Button(
                         onClick = { takePhotoWithLocation() },
-                        enabled = currentLocation != null
+                        enabled = currentLocation != null && geoObjects.pylons.size > 1
                     ) {
                         Text("Ф")
                     }

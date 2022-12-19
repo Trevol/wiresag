@@ -165,7 +165,10 @@ operator fun PointsAtDistanceToLineSegmentMidpoint.invoke(segment: Pair<Location
     this(segment.map { it.toLocationRadians() })
         .map { it.toLocation() }
 
-@JvmName("invokeGeoPoint")
+@JvmName("invokeGeoPointPair")
 operator fun PointsAtDistanceToLineSegmentMidpoint.invoke(segment: Pair<IGeoPoint, IGeoPoint>) =
     this(segment.map { it.toLocationRadians() })
         .map { it.toLocation() }
+
+inline operator fun PointsAtDistanceToLineSegmentMidpoint.invoke(p1: IGeoPoint, p2: IGeoPoint) =
+    this(p1 to p2)
