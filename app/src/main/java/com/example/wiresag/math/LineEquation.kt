@@ -1,7 +1,5 @@
 package com.example.wiresag.math
 
-import math.Point
-
 class LineEquation(val k: Double, val y0: Double) {
     constructor(k: Double, p: Point) : this(k = k, y0 = p.y - p.x * k)
     constructor(p1: Point, p2: Point) : this(k = k(p2, p1), p1)

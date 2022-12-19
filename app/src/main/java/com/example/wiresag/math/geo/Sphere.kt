@@ -1,11 +1,10 @@
 package com.example.wiresag.math.geo
 
 import android.location.Location
-import com.example.wiresag.location.Location
 import com.example.wiresag.location.LocationRadians
 import com.example.wiresag.location.toLocation
 import com.example.wiresag.location.toLocationRadians
-import math.squared
+import com.example.wiresag.math.squared
 import kotlin.math.*
 
 open class Sphere(val r: Double) {

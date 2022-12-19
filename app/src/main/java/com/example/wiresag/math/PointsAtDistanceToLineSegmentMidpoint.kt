@@ -5,7 +5,6 @@ import com.example.wiresag.location.LocationRadians
 import com.example.wiresag.location.plus
 import com.example.wiresag.location.toLocation
 import com.example.wiresag.location.toLocationRadians
-import math.*
 import com.example.wiresag.math.geo.centralAngle
 import com.example.wiresag.math.geo.midpoint
 import com.example.wiresag.utils.map
