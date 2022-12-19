@@ -2,7 +2,6 @@ package com.example.wiresag.viewModel
 
 import android.content.Context
 import android.location.Location
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -100,12 +99,14 @@ class WireSagViewModel(
         }
     }
 
+    private val maxDistanceFromPhotoToSpan = 330.0
+
     private fun takePhotoWithLocation() {
         currentLocation ?: return
         photoRequest.takePhoto { photo ->
             val photo = photo ?: return@takePhoto
             val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
-            val span = geoObjects.nearestWireSpan(currentGeoPoint, 30.0) ?: return@takePhoto
+            val span = geoObjects.nearestWireSpan(currentGeoPoint, maxDistanceFromPhotoToSpan) ?: return@takePhoto
             photoForAnnotation = span.photos.addItem(WireSpanPhoto(span, PhotoWithGeoPoint(photo, currentGeoPoint)))
         }
     }
@@ -118,7 +119,7 @@ class WireSagViewModel(
                     modifier = Modifier
                         .fillMaxSize()
                         .zIndex(2f),
-                    wireSpanPhoto = photoForAnnotation!!,
+                    spanPhoto = photoForAnnotation!!,
                     onClose = { photoForAnnotation = null }
                 )
             }

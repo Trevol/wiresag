@@ -1,11 +1,11 @@
 package com.example.wiresag.state
 
 import android.graphics.Bitmap
-import android.graphics.PointF
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.geometry.Offset
+import com.example.wiresag.location.GeoPointAware
 import com.example.wiresag.location.midpoint
-import com.example.wiresag.location.toLocationRadians
 import com.example.wiresag.math.invoke
 import com.example.wiresag.math.squareDistance
 import com.example.wiresag.osmdroid.toGeoPoint
@@ -16,13 +16,6 @@ import kotlin.math.acos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-interface GeoPointAware {
-    val geoPoint: GeoPoint
-}
-
-fun <T : GeoPointAware> List<T>.nearest(): T {
-    TODO()
-}
 
 data class Pylon(override val geoPoint: GeoPoint) : GeoPointAware {
     val name = "Опора ${DMS(geoPoint.latitude)}/${DMS(geoPoint.longitude)}"
@@ -48,11 +41,21 @@ data class WireSpanPhoto(
     val span: WireSpan,
     val photoWithGeoPoint: PhotoWithGeoPoint
 ) {
-    val annotation = Annotation()
+    private val points: MutableList<Offset> = mutableStateListOf()
+    val readOnlyPoints get() = points as List<Offset>
+    fun addPoint(point: Offset) {
+        if (points.size < 3) {
+            points.add(point)
+        }
+    }
+    fun clearPoints(point: Offset) {
+        points.clear()
+    }
+
     val estimatedWireSag = derivedStateOf { estimateWireSag() }
 
     private fun estimateWireSag(): WireSagParams? {
-        val points = annotation.points.toList()
+        val points = points.toList()
         if (points.size < 3) {
             return null
         }
@@ -70,20 +73,18 @@ data class WireSpanPhoto(
         val angB = acos((sqAB + sqBC - sqAC) / (2 * ab * bc))
         val angA = acos((sqAB + sqAC - sqBC) / (2 * ab * ac))
         val sagPx = bc * sin(angB)
-        //span.length / ab = sagMeters / sagPx
+        //Из подобия треугольников: span.length / ab = sagMeters / sagPx
         val sagMeters = sagPx * span.length / ab
         // TODO: из разных ракурсов и расстояний от пролета надо получать примерно одинаковые провисания
         // TODO: если съемка ведется НЕ на нормали к середине пролета???
         return WireSagParams(angleA = angA, angleB = angB, sag = sagMeters)
     }
 
-    class Annotation {
-        val points: MutableList<PointF> = mutableStateListOf()
-    }
-}
+    data class WireSagParams(
+        val angleA: Float,
+        val angleB: Float,
+        val sag: Float
+    )
 
-data class WireSagParams(
-    val angleA: Float,
-    val angleB: Float,
-    val sag: Float
-)
+    data class Abc(val a:Offset, val b:Offset, val c:Offset)
+}

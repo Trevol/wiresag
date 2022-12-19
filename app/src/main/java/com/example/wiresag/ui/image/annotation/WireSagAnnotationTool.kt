@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import com.example.wiresag.R
@@ -25,7 +26,7 @@ import com.example.wiresag.utils.rememberMutableStateOf
 @Composable
 fun WireSagAnnotationTool(
     modifier: Modifier,
-    wireSpanPhoto: WireSpanPhoto,
+    spanPhoto: WireSpanPhoto,
     onClose: () -> Unit
 ) {
     BackHandler(onBack = { onClose() })
@@ -37,9 +38,8 @@ fun WireSagAnnotationTool(
 
         var translation by rememberMutableStateOf(Offset.Zero)
         var scale by rememberMutableStateOf(1f)
-        val clicks = remember { mutableStateListOf<Offset>() }
 
-        val imageBitmap = wireSpanPhoto.photoWithGeoPoint.photo.asImageBitmap()
+        val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
 
         LayeredImage(
             modifier = Modifier.fillMaxSize(),
@@ -52,23 +52,28 @@ fun WireSagAnnotationTool(
             },
             onClick = { _, imgPosition ->
                 if (imageBitmap.rect().contains(imgPosition)) {
-                    clicks.add(imgPosition)
-                }
-            },
-            onLongClick = { _, _ -> clicks.clear() }
-        ) {
-
-            clicks.forEachIndexed { i, it ->
-                drawCircle(
-                    color = Color.Green,
-                    5f,
-                    center = it,
-                )
-                if (i > 0) {
-                    drawLine(Color.Green, it, clicks[i - 1])
+                    spanPhoto.addPoint(imgPosition)
                 }
             }
+        ) {
+            annotationAndSagEstimation(spanPhoto, scale)
         }
     }
 
+}
+
+private fun DrawScope.annotationAndSagEstimation(spanPhoto: WireSpanPhoto, scale: Float) {
+    spanPhoto.readOnlyPoints.forEachIndexed { i, it ->
+        drawCircle(
+            color = Color.Green,
+            5f,
+            center = it,
+        )
+        if (i > 0) {
+            drawLine(Color.Green, it, spanPhoto.readOnlyPoints[i - 1])
+        }
+    }
+    if (spanPhoto.readOnlyPoints.size == 3) {
+        drawLine(Color.Green, spanPhoto.readOnlyPoints.first(), spanPhoto.readOnlyPoints.last())
+    }
 }
