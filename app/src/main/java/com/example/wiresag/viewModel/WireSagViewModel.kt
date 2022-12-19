@@ -25,6 +25,7 @@ import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import com.example.wiresag.utils.DMS
+import com.example.wiresag.utils.addItem
 import com.example.wiresag.utils.prettyFormat
 import com.example.wiresag.utils.round
 import org.osmdroid.config.Configuration
@@ -100,22 +101,15 @@ class WireSagViewModel(
     }
 
     private fun takePhotoWithLocation() {
-        if (currentLocation == null) {
-            return
-        }
+        currentLocation ?: return
         photoRequest.takePhoto { photo ->
-            if (photo == null) {
-                return@takePhoto
-            }
+            val photo = photo ?: return@takePhoto
             val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
-            val photoWithGeoPoint = PhotoWithGeoPoint(photo, currentGeoPoint)
-            geoObjects.photos.add(photoWithGeoPoint)
-            TODO()
-            //photoForAnnotation = WireSpanPhoto(pylon1, pylon2, photoWithGeoPoint)
+            val span = geoObjects.nearestWireSpan(currentGeoPoint, 30.0) ?: return@takePhoto
+            photoForAnnotation = span.photos.addItem(WireSpanPhoto(span, PhotoWithGeoPoint(photo, currentGeoPoint)))
         }
     }
 
-    @ExperimentalFoundationApi
     @Composable
     fun View() {
         Column(modifier = Modifier.fillMaxSize()) {

@@ -21,7 +21,7 @@ import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.utils.rememberMutableStateOf
 
-@ExperimentalFoundationApi
+
 @Composable
 fun WireSagAnnotationTool(
     modifier: Modifier,

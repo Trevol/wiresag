@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.PointF
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
+import com.example.wiresag.location.midpoint
+import com.example.wiresag.location.toLocationRadians
 import com.example.wiresag.math.invoke
 import com.example.wiresag.math.squareDistance
 import com.example.wiresag.osmdroid.toGeoPoint
@@ -24,6 +26,7 @@ data class WireSpan(
     val pylon2: Pylon
 ) {
     val length by lazy { pylon1.geoPoint.distanceToAsDouble(pylon2.geoPoint).toFloat() }
+    val midpoint by lazy { pylon1.geoPoint.midpoint(pylon2.geoPoint) }
     val photos = mutableStateListOf<WireSpanPhoto>()
     val placesForPhoto = derivedStateOf {
         photoPlacesSolver(pylon1.geoPoint, pylon2.geoPoint).map { it.toGeoPoint() }

@@ -1,5 +1,7 @@
 package com.example.wiresag.state
 
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.wiresag.math.PointsAtDistanceToLineSegmentMidpoint
@@ -9,11 +11,17 @@ import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.utils.map
 import org.osmdroid.api.IGeoPoint
 import org.osmdroid.util.GeoPoint
+import kotlin.math.max
 
 class GeoObjects {
-    val pylons: SnapshotStateList<Pylon> = mutableStateListOf()
-    val placesForPhoto: SnapshotStateList<IGeoPoint> = mutableStateListOf()
-    val photos: SnapshotStateList<PhotoWithGeoPoint> = mutableStateListOf()
+    val pylons = mutableStateListOf<Pylon>()
+    val spans = mutableStateListOf<WireSpan>()
+
+    //val placesForPhoto = mutableStateListOf<GeoPoint>()
+    val placesForPhoto by derivedStateOf { spans.flatMap { it.placesForPhoto.value.toList() } }
+
+    //val photos = mutableStateListOf<PhotoWithGeoPoint>()
+    val photos by derivedStateOf { spans.flatMap { it.photos } }
 
     fun markPylon(geoPoint: GeoPoint) {
         val distanceToNearestPylon = pylons.minOfOrNull { it.geoPoint.distanceToAsDouble(geoPoint) }
@@ -22,13 +30,20 @@ class GeoObjects {
 
         val thisPylon = Pylon(geoPoint).also { pylons.add(it) }
         if (pylons.size > 1) {
-            val span = thisPylon.geoPoint to pylons[pylons.lastIndex - 1].geoPoint
-            val newPhotoPlaces = photoPlacesSolver(span)
-                .map { it.toGeoPoint() }
-            placesForPhoto.add(newPhotoPlaces.first)
-            placesForPhoto.add(newPhotoPlaces.second)
+            spans.add(WireSpan(thisPylon, pylons[pylons.lastIndex - 1]))
         }
     }
+
+    fun nearestWireSpan(geoPoint: GeoPoint, maxDistance: Double) =
+        spans.map { it to it.midpoint.distanceToAsDouble(geoPoint) }
+            .minByOrNull { (span, dist) -> dist }
+            ?.let { (span, dist) ->
+                if (dist <= maxDistance) {
+                    span
+                } else {
+                    null
+                }
+            }
 
     companion object {
         const val PylonDistanceThreshold = 3.0
