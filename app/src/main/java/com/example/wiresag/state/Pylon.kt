@@ -42,16 +42,7 @@ data class WireSpanPhoto(
     val span: WireSpan,
     val photoWithGeoPoint: PhotoWithGeoPoint
 ) {
-    private val points = LimitedSnapshotStateList<Offset>(maxSize = 3)
-    val readOnlyPoints get() = points as List<Offset>
-    fun addPoint(point: Offset) {
-        if (points.size < 3) {
-            points.add(point)
-        }
-    }
-    fun clearPoints(point: Offset) {
-        points.clear()
-    }
+    val points = LimitedSnapshotStateList<Offset>(maxSize = 3)
 
     val estimatedWireSag = derivedStateOf { estimateWireSag() }
 

@@ -52,7 +52,7 @@ fun WireSagAnnotationTool(
             },
             onClick = { _, imgPosition ->
                 if (imageBitmap.rect().contains(imgPosition)) {
-                    spanPhoto.addPoint(imgPosition)
+                    spanPhoto.points.add(imgPosition)
                 }
             }
         ) {
@@ -63,17 +63,13 @@ fun WireSagAnnotationTool(
 }
 
 private fun DrawScope.annotationAndSagEstimation(spanPhoto: WireSpanPhoto, scale: Float) {
-    spanPhoto.readOnlyPoints.forEachIndexed { i, it ->
-        drawCircle(
-            color = Color.Green,
-            5f,
-            center = it,
-        )
+    spanPhoto.points.forEachIndexed { i, it ->
+        drawCircle(Color.Green, 5f, it)
         if (i > 0) {
-            drawLine(Color.Green, it, spanPhoto.readOnlyPoints[i - 1])
+            drawLine(Color.Green, it, spanPhoto.points[i - 1])
         }
     }
-    if (spanPhoto.readOnlyPoints.size == 3) {
-        drawLine(Color.Green, spanPhoto.readOnlyPoints.first(), spanPhoto.readOnlyPoints.last())
+    if (spanPhoto.points.size == 3) {
+        drawLine(Color.Green, spanPhoto.points.first(), spanPhoto.points.last())
     }
 }
