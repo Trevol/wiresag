@@ -10,6 +10,7 @@ import com.example.wiresag.math.invoke
 import com.example.wiresag.math.squareDistance
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.utils.DMS
+import com.example.wiresag.utils.LimitedSnapshotStateList
 import com.example.wiresag.utils.map
 import org.osmdroid.util.GeoPoint
 import kotlin.math.acos
@@ -41,7 +42,7 @@ data class WireSpanPhoto(
     val span: WireSpan,
     val photoWithGeoPoint: PhotoWithGeoPoint
 ) {
-    private val points: MutableList<Offset> = mutableStateListOf()
+    private val points = LimitedSnapshotStateList<Offset>(maxSize = 3)
     val readOnlyPoints get() = points as List<Offset>
     fun addPoint(point: Offset) {
         if (points.size < 3) {
