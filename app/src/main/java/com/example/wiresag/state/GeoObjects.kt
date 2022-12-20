@@ -18,7 +18,7 @@ import kotlin.math.max
 class GeoObjects {
     val pylons = mutableStateListOf<Pylon>()
     val spans = mutableStateListOf<WireSpan>()
-    val placesForPhoto by derivedStateOf { spans.flatMap { it.placesForPhoto.value.toList() } }
+    val placesForPhoto by derivedStateOf { spans.flatMap { it.placesForPhoto.toList() } }
     val photos by derivedStateOf { spans.flatMap { it.photos } }
 
     fun markPylon(geoPoint: GeoPoint) {
@@ -36,6 +36,10 @@ class GeoObjects {
 
     fun nearestWireSpan(geoPoint: GeoPoint, maxDistance: Double) =
         spans.nearest(geoPoint, maxDistance)?.item
+
+    private fun deleteSpanPhoto(photoForAnnotation: WireSpanPhoto) {
+        TODO("Not yet implemented")
+    }
 
     companion object {
         const val PylonDistanceThreshold = 3.0

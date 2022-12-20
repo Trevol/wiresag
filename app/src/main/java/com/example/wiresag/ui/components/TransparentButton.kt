@@ -32,7 +32,10 @@ fun TransparentButton(
         elevation,
         shape,
         BorderStroke(0.dp, Color.Transparent),
-        ButtonDefaults.buttonColors(Color.Transparent),
+        ButtonDefaults.buttonColors(
+            backgroundColor = Color.Transparent,
+            disabledBackgroundColor = Color.Transparent
+        ),
         contentPadding,
         content
     )

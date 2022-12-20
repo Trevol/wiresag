@@ -3,25 +3,30 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.location.Location
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
+import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.CenteredOverlayItem
 import com.example.wiresag.mapView.PylonOverlayItem
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.state.WireSpanPhoto
-import com.example.wiresag.state.PhotoWithGeoPoint
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
+import com.example.wiresag.state.PhotoWithGeoPoint
+import com.example.wiresag.state.WireSpanPhoto
+import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.addItem
@@ -106,9 +111,15 @@ class WireSagViewModel(
         photoRequest.takePhoto { photo ->
             val photo = photo ?: return@takePhoto
             val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
-            val span = geoObjects.nearestWireSpan(currentGeoPoint, maxDistanceFromPhotoToSpan) ?: return@takePhoto
-            photoForAnnotation = span.photos.addItem(WireSpanPhoto(span, PhotoWithGeoPoint(photo, currentGeoPoint)))
+            val span = geoObjects.nearestWireSpan(currentGeoPoint, maxDistanceFromPhotoToSpan)
+                ?: return@takePhoto
+            photoForAnnotation =
+                span.photos.addItem(WireSpanPhoto(span, PhotoWithGeoPoint(photo, currentGeoPoint)))
         }
+    }
+
+    private fun deleteSpanPhoto(spanPhoto: WireSpanPhoto) {
+        spanPhoto.span.photos.remove(spanPhoto)
     }
 
     @Composable
@@ -120,25 +131,41 @@ class WireSagViewModel(
                         .fillMaxSize()
                         .zIndex(2f),
                     spanPhoto = photoForAnnotation!!,
-                    onClose = { photoForAnnotation = null }
+                    onClose = { photoForAnnotation = null },
+                    onDelete = {
+                        photoForAnnotation?.span?.photos?.remove(photoForAnnotation)
+                        photoForAnnotation = null
+                    }
                 )
             }
 
             Box(modifier = Modifier.weight(1f)) {
+
                 Row(
                     modifier = Modifier
-                        .padding(start = 20.dp)
                         .zIndex(1f),
-                    horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Button(onClick = { markPylon() }, enabled = currentLocation != null) {
-                        Text("О")
+                    Spacer(Modifier.weight(1f))
+
+                    TransparentButton(
+                        onClick = { markPylon() },
+                        enabled = currentLocation != null
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
+                            ""
+                        )
+
                     }
-                    Button(
+
+                    TransparentButton(
                         onClick = { takePhotoWithLocation() },
                         enabled = currentLocation != null && geoObjects.pylons.size > 1
                     ) {
-                        Text("Ф")
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_add_a_photo_24),
+                            ""
+                        )
                     }
                 }
 

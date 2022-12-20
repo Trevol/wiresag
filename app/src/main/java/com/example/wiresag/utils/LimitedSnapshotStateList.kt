@@ -7,6 +7,8 @@ class LimitedSnapshotStateList<E>(
     private val delegate: SnapshotStateList<E> = SnapshotStateList()
 ) : MutableList<E> by delegate {
 
+    fun isFull() = size == maxSize
+
     override fun add(element: E) = if (size < maxSize) {
         delegate.add(element)
     } else {
