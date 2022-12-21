@@ -19,6 +19,6 @@ class PermissionsRequest(private val parent: ComponentActivity, vararg val permi
 
     fun launch(result: (granted: Boolean) -> Unit) {
         requestResult = result
-        request.launch(permissions)
+        request.launch(permissions as Array<String>)
     }
 }
