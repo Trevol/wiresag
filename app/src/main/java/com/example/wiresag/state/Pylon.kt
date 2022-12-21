@@ -99,6 +99,7 @@ fun SagTriangle(unclassifiedVertices: List<Offset>): SagTriangle {
     )
     val (ab, ac, bc) = sides.sortedByDescending { it.squareDistance() }
     val (a, b) = ab
-    val c = ac.let { (p1, p2) -> if (p1 != a) p1 else p2 }
+    // C is common point of AC and BC
+    val c = if (ac.first == bc.first || ac.first == bc.second) ac.first else ac.second
     return SagTriangle(a = a, b = b, c = c)
 }
