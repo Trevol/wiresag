@@ -3,17 +3,12 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.location.Location
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
@@ -26,6 +21,7 @@ import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.state.PhotoWithGeoPoint
 import com.example.wiresag.state.WireSpanPhoto
+import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import com.example.wiresag.utils.DMS
@@ -141,31 +137,21 @@ class WireSagViewModel(
 
             Box(modifier = Modifier.weight(1f)) {
 
-                Row(
-                    modifier = Modifier
-                        .zIndex(1f),
-                ) {
+                Row(modifier = Modifier.zIndex(1f)) {
                     Spacer(Modifier.weight(1f))
 
                     TransparentButton(
                         onClick = { markPylon() },
                         enabled = currentLocation != null
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_arrow_upward_24),
-                            ""
-                        )
-
+                        Icon(R.drawable.ic_baseline_arrow_upward_24)
                     }
 
                     TransparentButton(
                         onClick = { takePhotoWithLocation() },
                         enabled = currentLocation != null && geoObjects.pylons.size > 1
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_add_a_photo_24),
-                            ""
-                        )
+                        Icon(R.drawable.ic_baseline_add_a_photo_24)
                     }
                 }
 
