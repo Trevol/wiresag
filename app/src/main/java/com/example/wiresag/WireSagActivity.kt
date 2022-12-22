@@ -15,6 +15,7 @@ import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.WireSagViewModel
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
@@ -69,18 +70,18 @@ class WireSagActivity : ComponentActivity() {
         )
 
         private fun locationProvider(): IMyLocationProvider {
-            /*val locationProvider = GpsMyLocationProvider(applicationContext)
+            val locationProvider = GpsMyLocationProvider(context)
                     .apply {
                         locationUpdateMinDistance = 0.001f
                         locationUpdateMinTime = 500
-                    }*/
+                    }
 
-            val locationProvider = DummyLocationProvider(
+            /*val locationProvider = DummyLocationProvider(
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
                 locationUpdateTime = 500
-            )
+            )*/
             return locationProvider
         }
 

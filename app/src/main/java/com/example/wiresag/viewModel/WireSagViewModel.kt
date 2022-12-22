@@ -100,7 +100,7 @@ class WireSagViewModel(
         }
     }
 
-    private val maxDistanceFromPhotoToSpan = 330.0
+    private val maxDistanceFromPhotoToSpan = 40.0
 
     private fun takePhotoWithLocation() {
         currentLocation ?: return
@@ -114,27 +114,24 @@ class WireSagViewModel(
         }
     }
 
-    private fun deleteSpanPhoto(spanPhoto: WireSpanPhoto) {
-        spanPhoto.span.photos.remove(spanPhoto)
-    }
-
     @Composable
     fun View() {
-        Column(modifier = Modifier.fillMaxSize()) {
-            if (photoForAnnotation != null) {
-                WireSagAnnotationTool(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(2f),
-                    spanPhoto = photoForAnnotation!!,
-                    onClose = { photoForAnnotation = null },
-                    onDelete = {
-                        photoForAnnotation?.span?.photos?.remove(photoForAnnotation)
-                        photoForAnnotation = null
-                    }
-                )
-            }
 
+        if (photoForAnnotation != null) {
+            WireSagAnnotationTool(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(2f),
+                spanPhoto = photoForAnnotation!!,
+                onClose = { photoForAnnotation = null },
+                onDelete = {
+                    photoForAnnotation?.span?.photos?.remove(photoForAnnotation)
+                    photoForAnnotation = null
+                }
+            )
+        }
+
+        Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.weight(1f)) {
 
                 Row(modifier = Modifier.zIndex(1f)) {

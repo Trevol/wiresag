@@ -5,8 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Refresh
@@ -20,7 +20,9 @@ import androidx.compose.ui.graphics.NativePaint
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.wiresag.math.toDegrees
 import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
@@ -28,6 +30,7 @@ import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.utils.rememberMutableStateOf
+import com.example.wiresag.utils.round
 
 @Composable
 fun WireSagAnnotationTool(
@@ -41,23 +44,47 @@ fun WireSagAnnotationTool(
     val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
 
     BackHandler(onBack = { onClose() })
-    Box(modifier = modifier) {
+    Box(modifier = modifier.background(Color.White)) {
 
-        Row(Modifier.zIndex(1f)) {
-            Icon(Icons.Outlined.Done,
-                modifier = Modifier
-                    .padding(ButtonDefaults.ContentPadding)
-                    .background(Color(127, 127, 127, 100))
-                    .clickable { onClose() }
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(1f)
+        ) {
+            Row {
+                Icon(Icons.Outlined.Done,
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding)
+                        .background(Color(127, 127, 127, 100))
+                        .clickable { onClose() }
+                )
 
-            Spacer(modifier = Modifier.weight(1f))
-            TransparentButton(onClick = { spanPhoto.annotation.points.clear() }) {
-                Icon(Icons.Outlined.Refresh)
+                Spacer(modifier = Modifier.weight(1f))
+
+
+
+                Icon(Icons.Outlined.Refresh,
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding)
+                        .background(Color(127, 127, 127, 100))
+                        .clickable { spanPhoto.annotation.points.clear() }
+                )
+                /*TransparentButton(onClick = { spanPhoto.annotation.points.clear() }) {
+                    Icon(Icons.Outlined.Refresh)
+                }*/
+
+                Icon(Icons.Outlined.Delete,
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding)
+                        .background(Color(127, 127, 127, 100))
+                        .clickable { onDelete(spanPhoto) }
+                )
+                /*TransparentButton(onClick = { onDelete(spanPhoto) }) {
+                    Icon(Icons.Outlined.Delete)
+                }*/
             }
-            TransparentButton(onClick = { onDelete(spanPhoto) }) {
-                Icon(Icons.Outlined.Delete)
-            }
+            Spacer(Modifier.weight(1f))
+            SagInfo(spanPhoto)
         }
 
         LayeredImage(
@@ -81,18 +108,32 @@ fun WireSagAnnotationTool(
 
 }
 
+@Composable
+fun SagInfo(photo: WireSpanPhoto) {
+    val triangle = photo.annotation.triangle
+    if (triangle != null) {
+        Row(
+            modifier = Modifier.background(Color.Gray),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("AB: ${photo.span.length.round(2)}m")
+            Text("∠A: ${triangle.angA.toDegrees().round(1)}°")
+            Text("∠B: ${triangle.angB.toDegrees().round(1)}°")
+            Text("Sag: ${photo.estimatedWireSag?.round(2)}m")
+        }
+    }
+}
+
 private fun DrawScope.drawAnnotation(spanPhoto: WireSpanPhoto, scale: Float) {
     if (spanPhoto.annotation.triangle != null) {
         drawAnnotatedTriangle(spanPhoto.annotation.triangle!!)
     } else {
-        drawAnnotatedPoints(spanPhoto.annotation.points)
+        drawPoints(spanPhoto.annotation.points, Color.Blue)
     }
 }
 
-typealias NativeColor = android.graphics.Color
-
 private val vertexLabelPaint = NativePaint().apply {
-    color = NativeColor.GREEN
+    color = android.graphics.Color.GREEN
     textSize = 24f
 }
 
@@ -114,11 +155,11 @@ private fun DrawScope.drawAnnotatedTriangle(triangle: SagTriangle) {
     drawText("C", triangle.c + Offset(0f, 24 + 5f), vertexLabelPaint)
 }
 
-private fun DrawScope.drawAnnotatedPoints(points: List<Offset>) {
+private fun DrawScope.drawPoints(points: List<Offset>, color: Color) {
     points.forEachIndexed { i, it ->
-        drawCircle(Color.Blue, 5f, it)
+        drawCircle(color, 5f, it)
         if (i > 0) {
-            drawLine(Color.Blue, it, points[i - 1])
+            drawLine(color, it, points[i - 1])
         }
     }
 }

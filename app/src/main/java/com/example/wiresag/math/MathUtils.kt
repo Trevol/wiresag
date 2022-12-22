@@ -2,10 +2,11 @@ package com.example.wiresag.math
 
 import kotlin.math.round
 
-fun Double.round(decimals: Int): Double {
-    val d = pow10(decimals)
-    return round(this * d) / d
-}
+fun Double.round(decimals: Int) = pow10(decimals)
+    .let { d -> round(this * d) / d }
+
+fun Float.round(decimals: Int) = pow10(decimals)
+    .let { d -> round(this * d) / d }
 
 private fun pow10(n: Int): Int {
     var result = 1
