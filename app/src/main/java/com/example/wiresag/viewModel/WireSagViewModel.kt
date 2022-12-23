@@ -1,22 +1,19 @@
 package com.example.wiresag.viewModel
 
 import android.content.Context
+import android.graphics.Color
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.NativePaint
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
-import com.example.wiresag.mapView.CenteredOverlayItem
-import com.example.wiresag.mapView.PylonOverlayItem
-import com.example.wiresag.mapView.WireSagMap
-import com.example.wiresag.mapView.WireSagMapView
+import com.example.wiresag.mapView.*
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.state.PhotoWithGeoPoint
@@ -24,10 +21,7 @@ import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
-import com.example.wiresag.utils.DMS
-import com.example.wiresag.utils.addItem
-import com.example.wiresag.utils.prettyFormat
-import com.example.wiresag.utils.round
+import com.example.wiresag.utils.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -38,6 +32,7 @@ class WireSagViewModel(
     private val photoRequest: PhotoRequest
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
+    private val currentGeoPoint by derivedStateOf { currentLocation?.toGeoPoint() }
     private var prevLocation: Location? = null
     private val geoObjects = GeoObjects()
     private var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
@@ -66,15 +61,7 @@ class WireSagViewModel(
     }
 
     private fun updateMapView(map: WireSagMapView) {
-
-        map.overlay.location.setLocation(currentLocation?.let { GeoPoint(it) })
-
-        val locationIsInitial = currentLocation != null && prevLocation == null
-        if (locationIsInitial) {
-            map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
-            prevLocation = currentLocation // animate only once!!!
-        }
-
+        /*map.overlay.location.setLocation(currentLocation?.let { GeoPoint(it) })
         val pylonsOnLayer = map.overlay.pylons.items.map { it.pylon }
         if (geoObjects.pylons.toList() != pylonsOnLayer) {
             map.overlay.pylons.removeAllItems()
@@ -82,16 +69,65 @@ class WireSagViewModel(
                 geoObjects.pylons.map { PylonOverlayItem(it) }
             )
         }
-
-        val photoPlacesOnLayer = map.overlay.photoPoints.items.map { it.point }
+        val photoPlacesOnLayer = map.overlay.placesForPhoto.items.map { it.point }
         if (geoObjects.placesForPhoto.toList() != photoPlacesOnLayer) {
-            map.overlay.photoPoints.removeAllItems()
-            map.overlay.photoPoints.addItems(
+            map.overlay.placesForPhoto.removeAllItems()
+            map.overlay.placesForPhoto.addItems(
                 geoObjects.placesForPhoto.map { CenteredOverlayItem(geoPoint = it) }
             )
+        }*/
+        val locationIsInitial = currentLocation != null && prevLocation == null
+        if (locationIsInitial) {
+            map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
+            prevLocation = currentLocation // animate only once!!!
         }
-
         map.postInvalidate()
+    }
+
+    private object Paints {
+        val location = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 0f
+            color = Color.GREEN
+        }
+        val pylon = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 0f
+            color = Color.argb(127, 0, 0, 255)
+        }
+        val placeForPhoto = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 0f
+            color = Color.argb(200, 255, 255, 0)
+        }
+        val normal = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 0f
+            color = Color.BLACK
+        }
+    }
+
+    private fun CanvasOverlay.DrawScope.mapCanvasDraw() {
+        geoObjects.pylons.forEachIndexed { i, pylon ->
+            val px = pylon.geoPoint.toPixelF()
+            if (i > 0) {
+                val prevPx = geoObjects.pylons[i - 1].geoPoint.toPixelF()
+                canvas.drawLine(px.x, px.y, prevPx.x, prevPx.y, Paints.pylon)
+            }
+            canvas.drawCircle(px.x, px.y, 10f, Paints.pylon)
+        }
+        geoObjects.spans.forEach { span ->
+            val (px1, px2) = span.normalPlaces.map { it.toPixelF() }
+            canvas.drawLine(px1.x, px1.y, px2.x, px2.y, Paints.normal)
+        }
+        geoObjects.placesForPhoto.forEach { place ->
+            val px = place.toPixelF()
+            canvas.drawCircle(px.x, px.y, 10f, Paints.placeForPhoto)
+        }
+        currentGeoPoint?.run {
+            val px = toPixelF()
+            canvas.drawCircle(px.x, px.y, 10f, Paints.location)
+        }
     }
 
     private fun markPylon() {
@@ -100,7 +136,7 @@ class WireSagViewModel(
         }
     }
 
-    private val maxDistanceFromPhotoToSpan = 40.0
+    private val maxDistanceFromPhotoToSpan = 200.0
 
     private fun takePhotoWithLocation() {
         currentLocation ?: return
@@ -157,7 +193,8 @@ class WireSagViewModel(
                     onInitMapView = {
                         it.controller.setZoom(15.0)
                     },
-                    onUpdateMapView = ::updateMapView
+                    onUpdateMapView = ::updateMapView,
+                    onCanvasDraw = { mapCanvasDraw() }
                 )
 
 

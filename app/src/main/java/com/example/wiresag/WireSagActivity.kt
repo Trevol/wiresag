@@ -6,7 +6,6 @@ import android.os.Environment
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.remember
 import com.example.wiresag.camera.CameraPhotoRequest
@@ -33,7 +32,6 @@ class WireSagActivity : ComponentActivity() {
 
     private lateinit var services: Services
 
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,18 +68,18 @@ class WireSagActivity : ComponentActivity() {
         )
 
         private fun locationProvider(): IMyLocationProvider {
-            val locationProvider = GpsMyLocationProvider(context)
+            /*val locationProvider = GpsMyLocationProvider(context)
                     .apply {
                         locationUpdateMinDistance = 0.001f
                         locationUpdateMinTime = 500
-                    }
+                    }*/
 
-            /*val locationProvider = DummyLocationProvider(
+            val locationProvider = DummyLocationProvider(
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
                 locationUpdateTime = 500
-            )*/
+            )
             return locationProvider
         }
 

@@ -1,5 +1,7 @@
 package com.example.wiresag.mapView
 
+/*
+
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -30,3 +32,4 @@ object MapViewMarker {
         return bmp
     }
 }
+*/
