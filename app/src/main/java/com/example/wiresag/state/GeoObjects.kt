@@ -1,19 +1,9 @@
 package com.example.wiresag.state
 
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.wiresag.location.nearest
-import com.example.wiresag.math.PointsAtDistanceToLineSegmentMidpoint
-import com.example.wiresag.math.geo.Earth
-import com.example.wiresag.math.invoke
-import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.utils.addItem
-import com.example.wiresag.utils.map
-import org.osmdroid.api.IGeoPoint
 import org.osmdroid.util.GeoPoint
-import kotlin.math.max
 
 class GeoObjects {
     val pylons = mutableStateListOf<Pylon>()

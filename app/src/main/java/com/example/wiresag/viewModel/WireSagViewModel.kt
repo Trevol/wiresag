@@ -61,21 +61,6 @@ class WireSagViewModel(
     }
 
     private fun updateMapView(map: WireSagMapView) {
-        /*map.overlay.location.setLocation(currentLocation?.let { GeoPoint(it) })
-        val pylonsOnLayer = map.overlay.pylons.items.map { it.pylon }
-        if (geoObjects.pylons.toList() != pylonsOnLayer) {
-            map.overlay.pylons.removeAllItems()
-            map.overlay.pylons.addItems(
-                geoObjects.pylons.map { PylonOverlayItem(it) }
-            )
-        }
-        val photoPlacesOnLayer = map.overlay.placesForPhoto.items.map { it.point }
-        if (geoObjects.placesForPhoto.toList() != photoPlacesOnLayer) {
-            map.overlay.placesForPhoto.removeAllItems()
-            map.overlay.placesForPhoto.addItems(
-                geoObjects.placesForPhoto.map { CenteredOverlayItem(geoPoint = it) }
-            )
-        }*/
         val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
             map.controller.animateTo(GeoPoint(currentLocation!!), 19.5, null)

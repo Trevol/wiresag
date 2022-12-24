@@ -16,33 +16,12 @@ class WireSagMapView(context: Context, onCanvasDraw: CanvasOverlay.DrawScope.() 
     MapView(context) {
 
     val canvas = CanvasOverlay(onCanvasDraw).addTo(overlays)
-    //val overlay = Overlays(this, onCanvasDraw)
 
     init {
         setMultiTouchControls(true)
         enableScaleBar()
         enableRotationGesture()
     }
-
-    /*class Overlays(map: WireSagMapView, onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}) {
-        val location = SimpleLocationOverlay2(MapViewMarker.location).addTo(map.overlays)
-
-        val pylons = ItemizedIconOverlay2(
-            mutableListOf<PylonOverlayItem>(),
-            MapViewMarker.pylon.toDrawable(Resources.getSystem()),
-            null,
-            map.context
-        ).addTo(map.overlays)
-
-        val placesForPhoto = ItemizedIconOverlay2(
-            mutableListOf<CenteredOverlayItem>(),
-            MapViewMarker.photoPlace.toDrawable(Resources.getSystem()),
-            null,
-            map.context
-        ).addTo(map.overlays)
-
-         val canvas = CanvasOverlay(onCanvasDraw).addTo(map.overlays)
-    }*/
 }
 
 @Composable
