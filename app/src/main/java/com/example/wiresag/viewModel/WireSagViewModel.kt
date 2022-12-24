@@ -3,12 +3,14 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.NativePaint
-import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
@@ -141,6 +143,13 @@ class WireSagViewModel(
         }
     }
 
+    private fun navigateToCurrentLocation(location: Location?) {
+        if (location != null) {
+            //TODO: Navigate!!!
+            println("TODO: Navigate!!!")
+        }
+    }
+
     @Composable
     fun View() {
 
@@ -168,7 +177,7 @@ class WireSagViewModel(
                         onClick = { markPylon() },
                         enabled = currentLocation != null
                     ) {
-                        Icon(R.drawable.ic_baseline_arrow_upward_24)
+                        Icon(R.drawable.ic_outline_add_location_alt_24)
                     }
 
                     TransparentButton(
@@ -190,31 +199,26 @@ class WireSagViewModel(
 
 
             }
-            Box() {
-                LocationInfo(currentLocation)
-            }
+            LocationInfo(currentLocation, onClick = ::navigateToCurrentLocation)
         }
 
     }
 }
 
 @Composable
-private fun LocationInfo(loc: Location?) {
-    Row {
-        Text("Лок-я: ")
-        if (loc == null) {
-            Text("определяется...")
+private fun LocationInfo(location: Location?, onClick: (Location?) -> Unit = {}) {
+    Row(Modifier.clickable { onClick(location) }, verticalAlignment = Alignment.CenterVertically) {
+        if (location == null) {
+            Icon(R.drawable.ic_outline_location_searching_12)
         } else {
-            Text(loc.info())
+            Icon(R.drawable.ic_outline_my_location_12)
+            Text(location.info(), fontSize = 10.sp)
         }
     }
 }
 
 private fun Location.info(): String {
     val speedInfo = if (hasSpeed()) speed.round(3) else ""
-    return "$provider ${DMS(latitude).prettyFormat()} ${DMS(longitude).prettyFormat()} ${
-        accuracy.round(
-            1
-        )
-    } $speedInfo"
+    val latLon = "${DMS(latitude).prettyFormat()}, ${DMS(longitude).prettyFormat()}"
+    return "$provider: $latLon   ${accuracy.round(1)}   $speedInfo"
 }
