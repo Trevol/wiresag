@@ -146,7 +146,6 @@ class WireSagViewModel(
     private fun navigateToCurrentLocation(location: Location?) {
         if (location != null) {
             //TODO: Navigate!!!
-            println("TODO: Navigate!!!")
         }
     }
 
