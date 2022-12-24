@@ -9,12 +9,9 @@ import com.example.wiresag.location.GeoPointAware
 import com.example.wiresag.location.midpoint
 import com.example.wiresag.math.invoke
 import com.example.wiresag.math.squareDistance
-import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.LimitedSnapshotStateList
-import com.example.wiresag.utils.map
 import org.osmdroid.util.GeoPoint
-import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -34,13 +31,13 @@ data class WireSpan(
     val length by lazy { pylon1.geoPoint.distanceToAsDouble(pylon2.geoPoint).toFloat() }
     val midpoint by lazy { pylon1.geoPoint.midpoint(pylon2.geoPoint) }
     val photos = mutableStateListOf<WireSpanPhoto>()
+    val photoLine by lazy { PhotoLine(this) }
 
-    val placesForPhoto by lazy {
-        photoPlacesSolver(pylon1.geoPoint, pylon2.geoPoint).map { it.toGeoPoint() }
-    }
-
-    val normalPlaces by lazy {
-        normalPlacesSolver(pylon1.geoPoint, pylon2.geoPoint).map { it.toGeoPoint() }
+    class PhotoLine(span: WireSpan) {
+        val pointsWithDistances = photoPlacesSolver(span.pylon1.geoPoint, span.pylon2.geoPoint)
+        val allPoints = pointsWithDistances.flatMap { listOf(it.point1, it.point2) }
+        val normalPoints = pointsWithDistances.maxByOrNull { it.distance }!!
+            .let { p -> p.point1 to p.point2 }
     }
 }
 
@@ -83,6 +80,7 @@ data class SagTriangle(val a: Offset, val b: Offset, val c: Offset) {
             throw Exception("a == b || a == c || b == c")
         }
     }
+
     private val abSquared = a.squareDistance(b)
     private val acSquared = a.squareDistance(c)
 

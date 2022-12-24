@@ -78,7 +78,7 @@ class WireSagViewModel(
         }*/
         val locationIsInitial = currentLocation != null && prevLocation == null
         if (locationIsInitial) {
-            map.controller.animateTo(GeoPoint(currentLocation!!), 15.0, null)
+            map.controller.animateTo(GeoPoint(currentLocation!!), 19.5, null)
             prevLocation = currentLocation // animate only once!!!
         }
         map.postInvalidate()
@@ -98,7 +98,7 @@ class WireSagViewModel(
         val placeForPhoto = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
             strokeWidth = 0f
-            color = Color.argb(200, 255, 255, 0)
+            color = Color.argb(127, 0, 0, 0)
         }
         val normal = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
@@ -116,14 +116,20 @@ class WireSagViewModel(
             }
             canvas.drawCircle(px.x, px.y, 10f, Paints.pylon)
         }
+
         geoObjects.spans.forEach { span ->
-            val (px1, px2) = span.normalPlaces.map { it.toPixelF() }
-            canvas.drawLine(px1.x, px1.y, px2.x, px2.y, Paints.normal)
+            span.photoLine.normalPoints
+                .map { it.toPixelF() }
+                .let { (px1, px2) ->
+                    canvas.drawLine(px1.x, px1.y, px2.x, px2.y, Paints.normal)
+                }
+            span.photoLine.allPoints
+                .map { it.toPixelF() }
+                .forEach { px ->
+                    canvas.drawCircle(px.x, px.y, 5f, Paints.placeForPhoto)
+                }
         }
-        geoObjects.placesForPhoto.forEach { place ->
-            val px = place.toPixelF()
-            canvas.drawCircle(px.x, px.y, 10f, Paints.placeForPhoto)
-        }
+
         currentGeoPoint?.run {
             val px = toPixelF()
             canvas.drawCircle(px.x, px.y, 10f, Paints.location)

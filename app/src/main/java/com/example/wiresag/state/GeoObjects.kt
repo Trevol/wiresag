@@ -18,8 +18,6 @@ import kotlin.math.max
 class GeoObjects {
     val pylons = mutableStateListOf<Pylon>()
     val spans = mutableStateListOf<WireSpan>()
-    val placesForPhoto by derivedStateOf { spans.flatMap { it.placesForPhoto.toList() } }
-    val photos by derivedStateOf { spans.flatMap { it.photos } }
 
     fun markPylon(geoPoint: GeoPoint) {
         val distanceToNearestPylon = pylons.nearest(geoPoint)?.distance ?: Double.POSITIVE_INFINITY
