@@ -196,8 +196,6 @@ class WireSagViewModel(
                     onUpdateMapView = ::updateMapView,
                     onCanvasDraw = { mapCanvasDraw() }
                 )
-
-
             }
             LocationInfo(currentLocation, onClick = ::navigateToCurrentLocation)
         }
