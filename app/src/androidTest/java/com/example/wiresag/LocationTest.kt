@@ -17,7 +17,9 @@ class LocationTest {
     fun out() {
         val angularDistToSpan = 20.0 / Earth.r
         val locationsWithDistToSpan =
-            PointsAtDistanceToLineSegmentMidpoint(angularDistanceToMidpoint = angularDistToSpan)
+            PointsAtDistanceToLineSegmentMidpoint(
+                angularDistancesToMidpoint = setOf(angularDistToSpan)
+            )
 
         val spans = listOf(
             Location(45.0, 23.0) to Location(45.0, 23.00078),
@@ -41,12 +43,12 @@ class LocationTest {
             val result = locationsWithDistToSpan.extendedInvoke(segment)
 
             PointsAtDistanceToLineSegmentMidpoint.Check.points(
-                result.points,
+                result.points.first().run { point1 to point2 },
                 result.segmentIn2D,
                 angularDistToSpan
             )
             PointsAtDistanceToLineSegmentMidpoint.Check.locations(
-                result.locations,
+                result.locations.first().run { location1 to location2 },
                 segment,
                 angularDistToSpan
             )
@@ -54,12 +56,14 @@ class LocationTest {
             val resultAsLocations = locationsWithDistToSpan(pylon1 to pylon2)
 
             PointsAtDistanceToLineSegmentMidpoint.Check.locations(
-                resultAsLocations.map { it.toLocationRadians() },
+                resultAsLocations.first().run { location1 to location2 }
+                    .map { it.toLocationRadians() },
                 segment,
                 angularDistToSpan
             )
 
-            val (n1, n2) = result.locations.toList().map { it.toLocation() }
+            val (n1, n2) = result.locations.first().run { location1 to location2 }
+                .map { it.toLocation() }
             "DistTo: ${n1.distanceTo(n2)}".println()
         }
 
