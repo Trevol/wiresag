@@ -20,7 +20,7 @@
         android:theme="@style/Theme.WireSag"
         tools:targetApi="31">
         <activity
-            android:name="com.example.wiresag.WireSagActivity"
+            android:name="com.example.wiresag.TestActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
             android:theme="@style/Theme.WireSag">

@@ -62,24 +62,23 @@ class WireSagActivity : ComponentActivity() {
             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: File(
                 context.filesDir,
                 "Pictures"
-            )
-                .also { it.mkdirs() },
+            ).also { it.mkdirs() },
             "wiresag_authority"
         )
 
         private fun locationProvider(): IMyLocationProvider {
-            /*val locationProvider = GpsMyLocationProvider(context)
-                    .apply {
-                        locationUpdateMinDistance = 0.001f
-                        locationUpdateMinTime = 500
-                    }*/
+            val locationProvider = GpsMyLocationProvider(context)
+                .apply {
+                    locationUpdateMinDistance = 0.001f
+                    locationUpdateMinTime = 500
+                }
 
-            val locationProvider = DummyLocationProvider(
+            /*val locationProvider = DummyLocationProvider(
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
                 locationUpdateTime = 500
-            )
+            )*/
             return locationProvider
         }
 
