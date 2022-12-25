@@ -1,9 +1,6 @@
 package com.example.wiresag.exps
 
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -19,10 +16,17 @@ typealias RemappedClick2 = (position: Offset, layerPosition: Offset) -> Unit
 
 val NoRemappedClick2: RemappedClick2 = { _, _ -> }
 
+data class TransformationParams(
+    val translation: Offset = Offset.Zero,
+    val scale: Float = 1f,
+    val centroid: Offset = Offset.Zero,
+    val centroidSize: Float = 0f
+)
+
 fun Modifier.transformableAndClickable2(
     translation: Offset = Offset.Zero,
     scale: Float = 1f,
-    onTransformationChange: (translation: Offset, scale: Float) -> Unit,
+    onTransformationChange: (TransformationParams) -> Unit,
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2
 ) = composed(
@@ -44,8 +48,12 @@ fun Modifier.transformableAndClickable2(
                     do {
                         event = awaitPointerEvent()
                         updatedOnTransformationChange(
-                            updatedTranslation + event.calculatePan(),
-                            updatedScale * event.calculateZoom()
+                            TransformationParams(
+                                translation = updatedTranslation + event.calculatePan(),
+                                scale = updatedScale * event.calculateZoom(),
+                                centroid = event.calculateCentroid(),
+                                centroidSize = event.calculateCentroidSize()
+                            )                           ,
                         )
                         if (event.type != PointerEventType.Release) {
                             firstReleaseAfterPress = false
