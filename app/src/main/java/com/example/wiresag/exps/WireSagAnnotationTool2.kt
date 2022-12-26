@@ -1,4 +1,4 @@
-package com.example.wiresag.ui.image.annotation
+package com.example.wiresag.exps
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -10,38 +10,54 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.NativePaint
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.wiresag.R
 import com.example.wiresag.math.toDegrees
 import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
-import com.example.wiresag.ui.components.TransparentButton
-import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
 
 @Composable
-fun WireSagAnnotationTool(
+fun WireSagAnnotationTool2(
     modifier: Modifier,
     spanPhoto: WireSpanPhoto,
     onClose: () -> Unit,
     onDelete: (WireSpanPhoto) -> Unit
 ) {
-    var translation by rememberMutableStateOf(Offset.Zero)
-    var scale by rememberMutableStateOf(1f)
     val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
+    var transformationParams by rememberMutableStateOf(TransformationParams.Default)
+    var size = IntSize.Zero
+
+    var prevOrigin = TransformOrigin.Center
+    val transformOrigin by remember {
+        derivedStateOf {
+            TransformOrigin(0f, 0f)
+            /*if (transformationParams.centroidSize == 0f ||
+                transformationParams.centroid == Offset.Unspecified ||
+                transformationParams.centroid == Offset.Infinite ||
+                size == IntSize.Zero
+            ) {
+                prevOrigin
+            } else {
+                prevOrigin = TransformOrigin(
+                    transformationParams.centroid.x / size.width,
+                    transformationParams.centroid.y / size.height
+                )
+                prevOrigin
+            }*/
+        }
+    }
 
     BackHandler(onBack = { onClose() })
     Box(modifier = modifier.background(Color.White)) {
@@ -62,6 +78,14 @@ fun WireSagAnnotationTool(
                 Spacer(modifier = Modifier.weight(1f))
 
 
+                Icon(R.drawable.ic_outline_1x_mobiledata_24,
+                    modifier = Modifier
+                        .padding(ButtonDefaults.ContentPadding)
+                        .background(Color(127, 127, 127, 100))
+                        .clickable {
+                            transformationParams = TransformationParams.Default
+                        }
+                )
 
                 Icon(Icons.Outlined.Refresh,
                     modifier = Modifier
@@ -87,22 +111,23 @@ fun WireSagAnnotationTool(
             SagInfo(spanPhoto)
         }
 
-        LayeredImage(
-            modifier = Modifier.fillMaxSize(),
+        LayeredImage2(
+            modifier = Modifier
+                .fillMaxSize()
+                //.onSizeChanged { size = it }
+                .onGloballyPositioned { size = it.size },
             image = imageBitmap,
-            translation = translation,
-            scale = scale,
-            onTransformationChange = { pan, zoom ->
-                translation = pan
-                scale = zoom
+            translation = transformationParams.translation,
+            scale = transformationParams.scale,
+            transformOrigin = transformOrigin,
+            onTransformationChange = {
+                transformationParams = it
             },
             onClick = { _, imgPosition ->
-                if (imageBitmap.rect.contains(imgPosition)) {
-                    spanPhoto.annotation.points.add(imgPosition)
-                }
+                spanPhoto.annotation.tryAddOrReplace(imgPosition)
             }
         ) {
-            drawAnnotation(spanPhoto, scale)
+            drawAnnotation(spanPhoto, transformationParams.scale)
         }
     }
 

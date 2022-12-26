@@ -8,7 +8,9 @@ import androidx.compose.ui.geometry.Offset
 import com.example.wiresag.location.GeoPointAware
 import com.example.wiresag.location.midpoint
 import com.example.wiresag.math.invoke
+import com.example.wiresag.math.pow2
 import com.example.wiresag.math.squareDistance
+import com.example.wiresag.ui.image.rect
 import com.example.wiresag.utils.DMS
 import com.example.wiresag.utils.LimitedSnapshotStateList
 import org.osmdroid.util.GeoPoint
@@ -47,7 +49,7 @@ data class WireSpanPhoto(
     val span: WireSpan,
     val photoWithGeoPoint: PhotoWithGeoPoint
 ) {
-    val annotation = Annotation()
+    val annotation = Annotation(this)
 
     val estimatedWireSag by derivedStateOf {
         annotation.triangle?.let { annotatedTriangle ->
@@ -59,7 +61,7 @@ data class WireSpanPhoto(
         }
     }
 
-    class Annotation {
+    class Annotation(val spanPhoto: WireSpanPhoto) {
         val points = LimitedSnapshotStateList<Offset>(maxSize = 3)
 
         val triangle by derivedStateOf {
@@ -67,6 +69,22 @@ data class WireSpanPhoto(
                 SagTriangle(points)
             } else {
                 null
+            }
+        }
+
+        fun tryAddOrReplace(point: Offset) {
+            if (spanPhoto.photoWithGeoPoint.photo.rect.contains(point)) {
+                val nearestPointWithDist = points.map { it to it.squareDistance(point) }
+                    .minByOrNull { (_, sqDist) -> sqDist }
+                if (nearestPointWithDist == null) {
+                    points.add(point)
+                } else {
+                    val (nearestPoint, squaredDistance) = nearestPointWithDist
+                    if (squaredDistance < pow2(100f)) {
+                        points.remove(nearestPoint)
+                    }
+                    points.add(point)
+                }
             }
         }
     }

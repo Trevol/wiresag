@@ -15,6 +15,7 @@ import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
+import com.example.wiresag.exps.WireSagAnnotationTool2
 import com.example.wiresag.mapView.*
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
@@ -145,7 +146,7 @@ class WireSagViewModel(
 
     private fun navigateToCurrentLocation(location: Location?) {
         if (location != null) {
-            //TODO: Navigate!!!
+            //TODO: Navigate!!! How?
         }
     }
 
@@ -153,7 +154,7 @@ class WireSagViewModel(
     fun View() {
 
         if (photoForAnnotation != null) {
-            WireSagAnnotationTool(
+            WireSagAnnotationTool2(
                 modifier = Modifier
                     .fillMaxSize()
                     .zIndex(2f),

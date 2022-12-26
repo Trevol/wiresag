@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 
 @Composable
@@ -13,6 +14,7 @@ fun LayeredImage2(
     image: ImageBitmap,
     translation: Offset = Offset.Zero,
     scale: Float = 1f,
+    transformOrigin: TransformOrigin,
     onTransformationChange: (TransformationParams) -> Unit,
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2,
@@ -23,6 +25,7 @@ fun LayeredImage2(
             .transformableAndClickable2(
                 translation,
                 scale,
+                transformOrigin,
                 onTransformationChange,
                 onClick = onClick,
                 onLongClick = onLongClick

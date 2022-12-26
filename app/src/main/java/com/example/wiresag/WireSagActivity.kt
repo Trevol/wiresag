@@ -19,6 +19,7 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
 class WireSagActivity : ComponentActivity() {
+
     private fun permissionsRequest() = PermissionsRequest(
         this,
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -35,11 +36,10 @@ class WireSagActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        services = Services(this)
-
-
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         //window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        services = Services(this)
 
         setContent { Text("Проверка разрешений...") }
 
@@ -67,18 +67,18 @@ class WireSagActivity : ComponentActivity() {
         )
 
         private fun locationProvider(): IMyLocationProvider {
-            val locationProvider = GpsMyLocationProvider(context)
+            /*val locationProvider = GpsMyLocationProvider(context)
                 .apply {
                     locationUpdateMinDistance = 0.001f
                     locationUpdateMinTime = 500
-                }
+                }*/
 
-            /*val locationProvider = DummyLocationProvider(
+            val locationProvider = DummyLocationProvider(
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
                 locationUpdateTime = 500
-            )*/
+            )
             return locationProvider
         }
 
