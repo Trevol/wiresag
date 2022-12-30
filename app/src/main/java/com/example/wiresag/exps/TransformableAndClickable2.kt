@@ -49,13 +49,13 @@ val TransformParameters.Companion.Default
     )
 
 fun Modifier.transformableAndClickable2(
-    transformParameters: TransformParameters,
+    transform: TransformParameters,
     onGesture: (GestureEvent) -> Unit,
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2
 ) = composed(
     factory = {
-        val updatedTransformParameters by rememberUpdatedState(transformParameters)
+        val updatedTransform by rememberUpdatedState(transform)
         val updatedOnGesture by rememberUpdatedState(onGesture)
         val updatedOnLongClick by rememberUpdatedState(onLongClick)
         val updatedOnClick by rememberUpdatedState(onClick)
@@ -86,7 +86,7 @@ fun Modifier.transformableAndClickable2(
                     if (firstReleaseAfterPress && event.changes.isNotEmpty()) {
                         val change = event.changes.first()
                         val rawPosition = change.position
-                        val remappedPosition = rawPosition.remap(updatedTransformParameters)
+                        val remappedPosition = rawPosition.remap(updatedTransform)
                         if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
                             updatedOnClick(rawPosition, remappedPosition)
                         } else {
@@ -97,11 +97,11 @@ fun Modifier.transformableAndClickable2(
                 }
             }
         }.graphicsLayer(
-            transformOrigin = updatedTransformParameters.transformOrigin,
-            scaleX = updatedTransformParameters.scale,
-            scaleY = updatedTransformParameters.scale,
-            translationX = updatedTransformParameters.translation.x,
-            translationY = updatedTransformParameters.translation.y
+            transformOrigin = updatedTransform.transformOrigin,
+            scaleX = updatedTransform.scale,
+            scaleY = updatedTransform.scale,
+            translationX = updatedTransform.translation.x,
+            translationY = updatedTransform.translation.y
         )
     }
 )
