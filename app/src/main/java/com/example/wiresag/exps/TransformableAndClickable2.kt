@@ -72,8 +72,8 @@ fun Modifier.transformableAndClickable2(
                         event = awaitPointerEvent()
                         updatedOnGesture(
                             GestureEvent(
-                                pan = updatedTransformParameters.translation + event.calculatePan(),
-                                zoom = updatedTransformParameters.scale * event.calculateZoom(),
+                                pan = event.calculatePan(),
+                                zoom = event.calculateZoom(),
                                 centroid = event.calculateCentroid(),
                                 centroidSize = event.calculateCentroidSize()
                             ),

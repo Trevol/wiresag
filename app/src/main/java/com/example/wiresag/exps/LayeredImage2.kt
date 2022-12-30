@@ -28,7 +28,7 @@ fun LayeredImage2(
             .onGloballyPositioned { state.size = it.size }
             .transformableAndClickable2(
                 transform,
-                onGesture = { onTransform(state.toTransformation(it)) },
+                onGesture = { onTransform(state.toTransformation(transform, it)) },
                 onClick = onClick,
                 onLongClick = onLongClick
             )
@@ -41,11 +41,11 @@ fun LayeredImage2(
 private class TransformState {
     var size by mutableStateOf(IntSize.Zero)
 
-    fun toTransformation(event: GestureEvent): TransformParameters {
+    fun toTransformation(prevTransform: TransformParameters, event: GestureEvent): TransformParameters {
         val origin = TransformOrigin(0f, 0f)
         return TransformParameters(
-            translation = event.pan,
-            scale = event.zoom,
+            translation = prevTransform.translation + event.pan,
+            scale = prevTransform.scale * event.zoom,
             transformOrigin = origin
         )
     }
