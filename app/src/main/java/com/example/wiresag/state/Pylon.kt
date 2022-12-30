@@ -54,8 +54,6 @@ data class WireSpanPhoto(
     val estimatedWireSag by derivedStateOf {
         annotation.triangle?.let { annotatedTriangle ->
             //Из подобия треугольников: span.length / ab = sagMeters / sagPx
-            // TODO: из разных ракурсов и расстояний от пролета надо получать примерно одинаковые провисания
-            // TODO: если съемка ведется НЕ на нормали к середине пролета???
             val sagMeters = annotatedTriangle.sagPx * span.length / annotatedTriangle.ab
             sagMeters
         }

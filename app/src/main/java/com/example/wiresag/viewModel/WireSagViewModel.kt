@@ -154,7 +154,7 @@ class WireSagViewModel(
     fun View() {
 
         if (photoForAnnotation != null) {
-            WireSagAnnotationTool2(
+            WireSagAnnotationTool(
                 modifier = Modifier
                     .fillMaxSize()
                     .zIndex(2f),

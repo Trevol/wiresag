@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 fun <T> rememberMutableStateOf(
     value: T,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()
-): MutableState<T> {
-    return remember { mutableStateOf(value = value, policy = policy) }
-}
+) = remember { mutableStateOf(value = value, policy = policy) }
+
+@Composable
+fun <T> rememberDerivedStateOf(calculation: () -> T) = remember { derivedStateOf(calculation) }

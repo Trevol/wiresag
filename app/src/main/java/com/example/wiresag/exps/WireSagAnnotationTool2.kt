@@ -24,7 +24,7 @@ import com.example.wiresag.math.toDegrees
 import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
-import com.example.wiresag.ui.image.rect
+import com.example.wiresag.utils.rememberDerivedStateOf
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
 
@@ -36,33 +36,14 @@ fun WireSagAnnotationTool2(
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
-    var transformationParams by rememberMutableStateOf(TransformationParams.Default)
-    var size = IntSize.Zero
 
-    var prevOrigin = TransformOrigin.Center
-    val transformOrigin by remember {
-        derivedStateOf {
-            TransformOrigin(0f, 0f)
-            /*if (transformationParams.centroidSize == 0f ||
-                transformationParams.centroid == Offset.Unspecified ||
-                transformationParams.centroid == Offset.Infinite ||
-                size == IntSize.Zero
-            ) {
-                prevOrigin
-            } else {
-                prevOrigin = TransformOrigin(
-                    transformationParams.centroid.x / size.width,
-                    transformationParams.centroid.y / size.height
-                )
-                prevOrigin
-            }*/
-        }
-    }
+    var imageTransform by rememberMutableStateOf(null as TransformParameters?)
+
 
     BackHandler(onBack = { onClose() })
     Box(modifier = modifier.background(Color.White)) {
 
-        Column(
+        /*Column(
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(1f)
@@ -83,7 +64,7 @@ fun WireSagAnnotationTool2(
                         .padding(ButtonDefaults.ContentPadding)
                         .background(Color(127, 127, 127, 100))
                         .clickable {
-                            transformationParams = TransformationParams.Default
+                            gestureRequest = GestureRequest.Default
                         }
                 )
 
@@ -93,9 +74,9 @@ fun WireSagAnnotationTool2(
                         .background(Color(127, 127, 127, 100))
                         .clickable { spanPhoto.annotation.points.clear() }
                 )
-                /*TransparentButton(onClick = { spanPhoto.annotation.points.clear() }) {
+                *//*TransparentButton(onClick = { spanPhoto.annotation.points.clear() }) {
                     Icon(Icons.Outlined.Refresh)
-                }*/
+                }*//*
 
                 Icon(Icons.Outlined.Delete,
                     modifier = Modifier
@@ -103,32 +84,23 @@ fun WireSagAnnotationTool2(
                         .background(Color(127, 127, 127, 100))
                         .clickable { onDelete(spanPhoto) }
                 )
-                /*TransparentButton(onClick = { onDelete(spanPhoto) }) {
+                *//*TransparentButton(onClick = { onDelete(spanPhoto) }) {
                     Icon(Icons.Outlined.Delete)
-                }*/
+                }*//*
             }
             Spacer(Modifier.weight(1f))
             SagInfo(spanPhoto)
         }
 
         LayeredImage2(
-            modifier = Modifier
-                .fillMaxSize()
-                //.onSizeChanged { size = it }
-                .onGloballyPositioned { size = it.size },
+            modifier = Modifier.fillMaxSize(),
             image = imageBitmap,
-            translation = transformationParams.translation,
-            scale = transformationParams.scale,
-            transformOrigin = transformOrigin,
-            onTransformationChange = {
-                transformationParams = it
-            },
             onClick = { _, imgPosition ->
                 spanPhoto.annotation.tryAddOrReplace(imgPosition)
             }
         ) {
-            drawAnnotation(spanPhoto, transformationParams.scale)
-        }
+            drawAnnotation(spanPhoto, gestureRequest.zoom)
+        }*/
     }
 
 }

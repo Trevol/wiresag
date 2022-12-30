@@ -16,38 +16,49 @@ typealias RemappedClick2 = (position: Offset, layerPosition: Offset) -> Unit
 
 val NoRemappedClick2: RemappedClick2 = { _, _ -> }
 
-data class TransformationParams(
-    val translation: Offset,
-    val scale: Float,
+data class GestureEvent(
+    val pan: Offset,
+    val zoom: Float,
     val centroid: Offset,
     val centroidSize: Float
 ) {
     companion object
 }
 
-val TransformationParams.Companion.Default
-    get() = TransformationParams(
-        translation = Offset.Zero,
-        scale = 1f,
+val GestureEvent.Companion.Default
+    get() = GestureEvent(
+        pan = Offset.Zero,
+        zoom = 1f,
         centroid = Offset.Zero,
         centroidSize = 0f
     )
 
+data class TransformParameters(
+    val translation: Offset,
+    val scale: Float,
+    val transformOrigin: TransformOrigin
+) {
+    companion object
+}
+
+val TransformParameters.Companion.Default
+    get() = TransformParameters(
+        Offset.Zero,
+        1f,
+        TransformOrigin.Center
+    )
+
 fun Modifier.transformableAndClickable2(
-    translation: Offset = Offset.Zero,
-    scale: Float = 1f,
-    transformOrigin: TransformOrigin,
-    onTransformationChange: (TransformationParams) -> Unit,
+    transformParameters: TransformParameters,
+    onGesture: (GestureEvent) -> Unit,
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2
 ) = composed(
     factory = {
-        val updatedTranslation by rememberUpdatedState(translation)
-        val updatedScale by rememberUpdatedState(scale)
-        val updatedOnTransformationChange by rememberUpdatedState(onTransformationChange)
+        val updatedTransformParameters by rememberUpdatedState(transformParameters)
+        val updatedOnGesture by rememberUpdatedState(onGesture)
         val updatedOnLongClick by rememberUpdatedState(onLongClick)
         val updatedOnClick by rememberUpdatedState(onClick)
-        val updatedTransformOrigin by rememberUpdatedState(transformOrigin)
 
         pointerInput(Unit) {
             forEachGesture {
@@ -59,10 +70,10 @@ fun Modifier.transformableAndClickable2(
 
                     do {
                         event = awaitPointerEvent()
-                        updatedOnTransformationChange(
-                            TransformationParams(
-                                translation = updatedTranslation + event.calculatePan(),
-                                scale = updatedScale * event.calculateZoom(),
+                        updatedOnGesture(
+                            GestureEvent(
+                                pan = updatedTransformParameters.translation + event.calculatePan(),
+                                zoom = updatedTransformParameters.scale * event.calculateZoom(),
                                 centroid = event.calculateCentroid(),
                                 centroidSize = event.calculateCentroidSize()
                             ),
@@ -75,12 +86,7 @@ fun Modifier.transformableAndClickable2(
                     if (firstReleaseAfterPress && event.changes.isNotEmpty()) {
                         val change = event.changes.first()
                         val rawPosition = change.position
-                        val remappedPosition =
-                            rawPosition.remap(
-                                updatedTranslation,
-                                updatedScale,
-                                updatedTransformOrigin
-                            )
+                        val remappedPosition = rawPosition.remap(updatedTransformParameters)
                         if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
                             updatedOnClick(rawPosition, remappedPosition)
                         } else {
@@ -91,17 +97,14 @@ fun Modifier.transformableAndClickable2(
                 }
             }
         }.graphicsLayer(
-            transformOrigin = updatedTransformOrigin,
-            scaleX = updatedScale,
-            scaleY = updatedScale,
-            translationX = updatedTranslation.x,
-            translationY = updatedTranslation.y
+            transformOrigin = updatedTransformParameters.transformOrigin,
+            scaleX = updatedTransformParameters.scale,
+            scaleY = updatedTransformParameters.scale,
+            translationX = updatedTransformParameters.translation.x,
+            translationY = updatedTransformParameters.translation.y
         )
     }
 )
 
-private fun Offset.remap(
-    translation: Offset,
-    scale: Float,
-    transformOrigin: TransformOrigin
-) = (this - translation) / scale
+private fun Offset.remap(transformParameters: TransformParameters) =
+    (this - transformParameters.translation) / transformParameters.scale
