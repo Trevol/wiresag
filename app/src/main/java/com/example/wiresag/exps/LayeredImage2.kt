@@ -35,6 +35,7 @@ fun LayeredImage2(
     }
 }
 
+
 private class TransformState {
     var size by mutableStateOf(IntSize.Zero)
 
@@ -45,12 +46,9 @@ private class TransformState {
         if (gesture.isReleaseEvent) {
             return prevTransform
         }
-        val scale = prevTransform.scale * gesture.zoom
-        val translation = prevTransform.translation + gesture.pan
-        //val translation = (prevTransform.translation + event.pan - event.centroid) * scale + event.centroid
         return TransformParameters(
-            translation = translation,
-            scale = scale,
+            translation = prevTransform.translation + gesture.pan + gesture.centroid * (1 - gesture.zoom),
+            scale = prevTransform.scale * gesture.zoom,
             gesture = gesture
         )
     }
