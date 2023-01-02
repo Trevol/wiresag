@@ -40,7 +40,7 @@ private class TransformState {
 
     fun toTransformation(
         prevTransform: TransformParameters,
-        gesture: GestureEvent
+        gesture: PanZoomGesture
     ): TransformParameters {
         if (gesture.isReleaseEvent) {
             return prevTransform

@@ -16,7 +16,7 @@ typealias RemappedClick2 = (position: Offset, layerPosition: Offset) -> Unit
 
 val NoRemappedClick2: RemappedClick2 = { _, _ -> }
 
-data class GestureEvent(
+data class PanZoomGesture(
     val pan: Offset,
     val zoom: Float,
     val centroid: Offset,
@@ -24,17 +24,17 @@ data class GestureEvent(
     val type: PointerEventType
 )
 
-val GestureEvent.isReleaseEvent get() = type == PointerEventType.Release
+val PanZoomGesture.isReleaseEvent get() = type == PointerEventType.Release
 
 data class TransformParameters(
     val translation: Offset = Offset.Zero,
     val scale: Float = 1f,
-    val gesture: GestureEvent? = null
+    val gesture: PanZoomGesture? = null
 )
 
 fun Modifier.transformableAndClickable2(
     transform: TransformParameters,
-    onGesture: (GestureEvent) -> Unit,
+    onGesture: (PanZoomGesture) -> Unit,
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2
 ) = composed(
@@ -55,7 +55,7 @@ fun Modifier.transformableAndClickable2(
                     do {
                         event = awaitPointerEvent()
                         updatedOnGesture(
-                            GestureEvent(
+                            PanZoomGesture(
                                 pan = event.calculatePan(),
                                 zoom = event.calculateZoom(),
                                 centroid = event.calculateCentroid(),
