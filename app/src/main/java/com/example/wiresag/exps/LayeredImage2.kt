@@ -4,18 +4,15 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
-import com.example.wiresag.utils.rememberDerivedStateOf
-import com.example.wiresag.utils.rememberMutableStateOf
 
 @Composable
 fun LayeredImage2(
     modifier: Modifier = Modifier,
     image: ImageBitmap,
-    transform: TransformParameters = TransformParameters.Default,
+    transform: TransformParameters = TransformParameters(),
     onTransform: (TransformParameters) -> Unit = {},
     onClick: RemappedClick2 = NoRemappedClick2,
     onLongClick: RemappedClick2 = NoRemappedClick2,
@@ -41,12 +38,20 @@ fun LayeredImage2(
 private class TransformState {
     var size by mutableStateOf(IntSize.Zero)
 
-    fun toTransformation(prevTransform: TransformParameters, event: GestureEvent): TransformParameters {
-        val origin = TransformOrigin(0f, 0f)
+    fun toTransformation(
+        prevTransform: TransformParameters,
+        gesture: GestureEvent
+    ): TransformParameters {
+        if (gesture.isReleaseEvent) {
+            return prevTransform
+        }
+        val scale = prevTransform.scale * gesture.zoom
+        val translation = prevTransform.translation + gesture.pan
+        //val translation = (prevTransform.translation + event.pan - event.centroid) * scale + event.centroid
         return TransformParameters(
-            translation = prevTransform.translation + event.pan,
-            scale = prevTransform.scale * event.zoom,
-            transformOrigin = origin
+            translation = translation,
+            scale = scale,
+            gesture = gesture
         )
     }
 

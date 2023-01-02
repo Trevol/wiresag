@@ -20,33 +20,17 @@ data class GestureEvent(
     val pan: Offset,
     val zoom: Float,
     val centroid: Offset,
-    val centroidSize: Float
-) {
-    companion object
-}
+    val centroidSize: Float,
+    val type: PointerEventType
+)
 
-val GestureEvent.Companion.Default
-    get() = GestureEvent(
-        pan = Offset.Zero,
-        zoom = 1f,
-        centroid = Offset.Zero,
-        centroidSize = 0f
-    )
+val GestureEvent.isReleaseEvent get() = type == PointerEventType.Release
 
 data class TransformParameters(
-    val translation: Offset,
-    val scale: Float,
-    val transformOrigin: TransformOrigin
-) {
-    companion object
-}
-
-val TransformParameters.Companion.Default
-    get() = TransformParameters(
-        Offset.Zero,
-        1f,
-        TransformOrigin.Center
-    )
+    val translation: Offset = Offset.Zero,
+    val scale: Float = 1f,
+    val gesture: GestureEvent? = null
+)
 
 fun Modifier.transformableAndClickable2(
     transform: TransformParameters,
@@ -75,7 +59,8 @@ fun Modifier.transformableAndClickable2(
                                 pan = event.calculatePan(),
                                 zoom = event.calculateZoom(),
                                 centroid = event.calculateCentroid(),
-                                centroidSize = event.calculateCentroidSize()
+                                centroidSize = event.calculateCentroidSize(),
+                                type = event.type
                             ),
                         )
                         if (event.type != PointerEventType.Release) {
@@ -97,7 +82,7 @@ fun Modifier.transformableAndClickable2(
                 }
             }
         }.graphicsLayer(
-            transformOrigin = updatedTransform.transformOrigin,
+            transformOrigin = TransformOrigin(0f, 0f),
             scaleX = updatedTransform.scale,
             scaleY = updatedTransform.scale,
             translationX = updatedTransform.translation.x,

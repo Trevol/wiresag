@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.remember
+import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
 import com.example.wiresag.osmdroid.DummyLocationProvider
 import com.example.wiresag.ui.Main
@@ -18,7 +19,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
-class WireSagActivity : ComponentActivity() {
+class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
 
     private fun permissionsRequest() = PermissionsRequest(
         this,
@@ -35,9 +36,6 @@ class WireSagActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        //window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         services = Services(this)
 
