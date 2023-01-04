@@ -86,13 +86,6 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 onClick = { _, imagePosition -> clicks.add(imagePosition) }
             ) {
                 drawPoints(clicks, PointMode.Points, Color(0, 0, 0, 120), 10 * transform.scale)
-                /*if (transformationParams.centroidSize > 0f)
-                    drawCircle(
-                        Color.Cyan,
-                        transformationParams.centroidSize / 2,
-                        transformationParams.centroid
-                    )*/
-
             }
         }
     }
