@@ -3,10 +3,7 @@ package com.example.wiresag.exps
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
@@ -18,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.utils.rememberMutableStateOf
@@ -35,15 +33,13 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
         )
 
         val centroid = Offset(75f, 375f)
-        fun newGesture(): PanZoomGesture {
-            return PanZoomGesture(
-                pan = Offset.Zero,
-                zoom = 1.1f,
-                centroid = centroid,
-                centroidSize = 10f,
-                type = PointerEventType.Move
-            )
-        }
+        fun newGesture() = PanZoomGesture(
+            pan = Offset.Zero,
+            zoom = 1.1f,
+            centroid = centroid,
+            centroidSize = 10f,
+            type = PointerEventType.Move
+        )
 
         setContent {
             var transform by rememberMutableStateOf(
@@ -59,6 +55,7 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 Button(onClick = { transform = transform.applyGesture(newGesture()) }) {
                     Text("Zoom")
                 }
+                Spacer(Modifier.width(6.dp))
                 Button(onClick = { transform = origTransform }) {
                     Text("Orig")
                 }
