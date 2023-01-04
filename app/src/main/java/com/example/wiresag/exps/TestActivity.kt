@@ -3,7 +3,12 @@ package com.example.wiresag.exps
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
@@ -12,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.zIndex
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.utils.rememberMutableStateOf
@@ -23,23 +29,51 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
 
         val clicks = mutableStateListOf<Offset>()
 
+        val origTransform = TransformParameters(
+            translation = Offset(50f, 350f),
+            scale = .6f
+        )
+
+        val centroid = Offset(75f, 375f)
+        fun newGesture(): PanZoomGesture {
+            return PanZoomGesture(
+                pan = Offset.Zero,
+                zoom = 1.1f,
+                centroid = centroid,
+                centroidSize = 10f,
+                type = PointerEventType.Move
+            )
+        }
+
         setContent {
             var transform by rememberMutableStateOf(
-                TransformParameters()
-                /*TransformParameters(
-                    translation = Offset(50f, 350f),
-                    scale = 2.1f,
-                    transformOrigin = TransformOrigin(.0f, .0f)
-                )*/
+                origTransform
             )
+
+            Row(
+                modifier = Modifier
+                    .zIndex(2f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(onClick = { transform = transform.applyGesture(newGesture()) }) {
+                    Text("Zoom")
+                }
+                Button(onClick = { transform = origTransform }) {
+                    Text("Orig")
+                }
+            }
 
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
                     .zIndex(1f)
             ) {
-                drawCircle(Color.Red, 10f, center)
-                drawCircle(Color.Black, 1f, center)
+                /*drawCircle(Color.Red, 10f, center)
+                drawCircle(Color.Black, 1f, center)*/
+
+                drawCircle(Color.Red, 10f, centroid)
+                drawCircle(Color.Black, 1f, centroid)
             }
 
             LayeredImage2(
