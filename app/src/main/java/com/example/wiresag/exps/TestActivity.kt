@@ -33,9 +33,9 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
         )
 
         val centroid = Offset(75f, 375f)
-        fun newGesture() = PanZoomGesture(
+        fun newGesture(zoom: Float) = PanZoomGesture(
             pan = Offset.Zero,
-            zoom = 1.1f,
+            zoom = zoom,
             centroid = centroid,
             centroidSize = 10f,
             type = PointerEventType.Move
@@ -52,13 +52,18 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Button(onClick = { transform = transform.applyGesture(newGesture()) }) {
-                    Text("Zoom")
+                Button(onClick = { transform = transform.applyGesture(newGesture(1.1f)) }) {
+                    Text("+")
+                }
+                Spacer(Modifier.width(6.dp))
+                Button(onClick = { transform = transform.applyGesture(newGesture(0.9f)) }) {
+                    Text("-")
                 }
                 Spacer(Modifier.width(6.dp))
                 Button(onClick = { transform = origTransform }) {
                     Text("Orig")
                 }
+
             }
 
             Canvas(
@@ -69,7 +74,7 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 /*drawCircle(Color.Red, 10f, center)
                 drawCircle(Color.Black, 1f, center)*/
 
-                drawCircle(Color.Red, 10f, centroid)
+                drawCircle(Color(255, 0, 0, 127), 10f, centroid)
                 drawCircle(Color.Black, 1f, centroid)
             }
 

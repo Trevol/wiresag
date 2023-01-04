@@ -35,7 +35,7 @@ fun TransformParameters.applyGesture(gesture: PanZoomGesture) =
         this
     } else
         TransformParameters(
-            translation = translation + gesture.pan + gesture.centroid * (1 - gesture.zoom),
+            translation = translation + gesture.pan + (gesture.centroid - translation) * (1 - gesture.zoom),
             scale = scale * gesture.zoom,
             gesture = gesture
         )
