@@ -25,8 +25,8 @@ class GeoObjects {
     fun nearestWireSpan(geoPoint: GeoPoint, maxDistance: Double) =
         spans.nearest(geoPoint, maxDistance)?.item
 
-    private fun deleteSpanPhoto(photoForAnnotation: WireSpanPhoto) {
-        TODO("Not yet implemented")
+    fun deleteSpanPhoto(photoForAnnotation: WireSpanPhoto) {
+        photoForAnnotation.span.photos.remove(photoForAnnotation)
     }
 
     companion object {

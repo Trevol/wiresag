@@ -160,8 +160,10 @@ class WireSagViewModel(
                 spanPhoto = photoForAnnotation!!,
                 onClose = { photoForAnnotation = null },
                 onDelete = {
-                    photoForAnnotation?.span?.photos?.remove(photoForAnnotation)
-                    photoForAnnotation = null
+                    if (photoForAnnotation != null){
+                        geoObjects.deleteSpanPhoto(photoForAnnotation!!)
+                        photoForAnnotation = null
+                    }
                 }
             )
         }
