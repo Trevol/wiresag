@@ -3,20 +3,16 @@ package com.example.wiresag.ui.image
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import com.example.wiresag.ui.input.NoRemappedClick
-import com.example.wiresag.ui.input.RemappedClick
-import com.example.wiresag.ui.input.transformableAndClickable
+import com.example.wiresag.ui.input.*
 
 @Composable
 fun LayeredImage(
     modifier: Modifier = Modifier,
     image: ImageBitmap,
-    translation: Offset = Offset.Zero,
-    scale: Float = 1f,
-    onTransformationChange: (translation: Offset, scale: Float) -> Unit,
+    transform: TransformParameters = TransformParameters(),
+    onTransform: (TransformParameters) -> Unit = {},
     onClick: RemappedClick = NoRemappedClick,
     onLongClick: RemappedClick = NoRemappedClick,
     onLayerDraw: DrawScope.() -> Unit
@@ -24,9 +20,8 @@ fun LayeredImage(
     Canvas(
         modifier = modifier
             .transformableAndClickable(
-                translation,
-                scale,
-                onTransformationChange,
+                transform,
+                onGesture = { onTransform(transform.applyGesture(it)) },
                 onClick = onClick,
                 onLongClick = onLongClick
             )
@@ -35,3 +30,13 @@ fun LayeredImage(
         onLayerDraw()
     }
 }
+
+fun TransformParameters.applyGesture(gesture: PanZoomGesture) =
+    if (gesture.isReleaseEvent) {
+        this
+    } else
+        TransformParameters(
+            translation = translation + gesture.pan + (gesture.centroid - translation) * (1 - gesture.zoom),
+            scale = scale * gesture.zoom,
+            gesture = gesture
+        )

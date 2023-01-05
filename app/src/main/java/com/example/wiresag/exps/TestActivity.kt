@@ -18,6 +18,10 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.wiresag.activity.FullScreenActivity
+import com.example.wiresag.ui.image.LayeredImage
+import com.example.wiresag.ui.image.applyGesture
+import com.example.wiresag.ui.input.PanZoomGesture
+import com.example.wiresag.ui.input.TransformParameters
 import com.example.wiresag.utils.rememberMutableStateOf
 
 class TestActivity : FullScreenActivity(keepScreenOn = true) {
@@ -78,7 +82,7 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 drawCircle(Color.Black, 1f, centroid)
             }
 
-            LayeredImage2(
+            LayeredImage(
                 modifier = Modifier.fillMaxSize(),
                 image = testBitmap().asImageBitmap(),
                 transform = transform,

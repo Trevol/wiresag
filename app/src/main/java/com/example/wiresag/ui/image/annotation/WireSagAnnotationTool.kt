@@ -26,9 +26,9 @@ import com.example.wiresag.math.toDegrees
 import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
-import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
+import com.example.wiresag.ui.input.TransformParameters
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
 
@@ -39,8 +39,7 @@ fun WireSagAnnotationTool(
     onClose: () -> Unit,
     onDelete: (WireSpanPhoto) -> Unit
 ) {
-    var translation by rememberMutableStateOf(Offset.Zero)
-    var scale by rememberMutableStateOf(1f)
+    var transform by rememberMutableStateOf(TransformParameters())
     val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
 
     BackHandler(onBack = { onClose() })
@@ -90,19 +89,15 @@ fun WireSagAnnotationTool(
         LayeredImage(
             modifier = Modifier.fillMaxSize(),
             image = imageBitmap,
-            translation = translation,
-            scale = scale,
-            onTransformationChange = { pan, zoom ->
-                translation = pan
-                scale = zoom
-            },
+            transform = transform,
+            onTransform = { transform = it },
             onClick = { _, imgPosition ->
                 if (imageBitmap.rect.contains(imgPosition)) {
                     spanPhoto.annotation.points.add(imgPosition)
                 }
             }
         ) {
-            drawAnnotation(spanPhoto, scale)
+            drawAnnotation(spanPhoto, transform.scale)
         }
     }
 

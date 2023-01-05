@@ -1,9 +1,6 @@
 package com.example.wiresag.ui.input
 
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -19,20 +16,34 @@ typealias RemappedClick = (position: Offset, layerPosition: Offset) -> Unit
 
 val NoRemappedClick: RemappedClick = { _, _ -> }
 
+data class PanZoomGesture(
+    val pan: Offset,
+    val zoom: Float,
+    val centroid: Offset,
+    val centroidSize: Float,
+    val type: PointerEventType
+)
+
+val PanZoomGesture.isReleaseEvent get() = type == PointerEventType.Release
+
+data class TransformParameters(
+    val translation: Offset = Offset.Zero,
+    val scale: Float = 1f,
+    val gesture: PanZoomGesture? = null
+)
+
 fun Modifier.transformableAndClickable(
-    translation: Offset = Offset.Zero,
-    scale: Float = 1f,
-    onTransformationChange: (translation: Offset, scale: Float) -> Unit,
+    transform: TransformParameters,
+    onGesture: (PanZoomGesture) -> Unit,
     onClick: RemappedClick = NoRemappedClick,
     onLongClick: RemappedClick = NoRemappedClick
 ) = composed(
     factory = {
-        val updatedTranslation by rememberUpdatedState(translation)
-        val updatedScale by rememberUpdatedState(scale)
-        val updatedOnTransformationChange by rememberUpdatedState(onTransformationChange)
+        val updatedTransform by rememberUpdatedState(transform)
+        val updatedOnGesture by rememberUpdatedState(onGesture)
         val updatedOnLongClick by rememberUpdatedState(onLongClick)
         val updatedOnClick by rememberUpdatedState(onClick)
-        val transformOrigin = TransformOrigin(0f, 0f)
+
         pointerInput(Unit) {
             forEachGesture {
                 awaitPointerEventScope {
@@ -43,9 +54,14 @@ fun Modifier.transformableAndClickable(
 
                     do {
                         event = awaitPointerEvent()
-                        updatedOnTransformationChange(
-                            updatedTranslation + event.calculatePan(),
-                            updatedScale * event.calculateZoom()
+                        updatedOnGesture(
+                            PanZoomGesture(
+                                pan = event.calculatePan(),
+                                zoom = event.calculateZoom(),
+                                centroid = event.calculateCentroid(),
+                                centroidSize = event.calculateCentroidSize(),
+                                type = event.type
+                            ),
                         )
                         if (event.type != PointerEventType.Release) {
                             firstReleaseAfterPress = false
@@ -55,8 +71,7 @@ fun Modifier.transformableAndClickable(
                     if (firstReleaseAfterPress && event.changes.isNotEmpty()) {
                         val change = event.changes.first()
                         val rawPosition = change.position
-                        val remappedPosition =
-                            rawPosition.remap(updatedTranslation, updatedScale, transformOrigin)
+                        val remappedPosition = rawPosition.remap(updatedTransform)
                         if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
                             updatedOnClick(rawPosition, remappedPosition)
                         } else {
@@ -67,17 +82,14 @@ fun Modifier.transformableAndClickable(
                 }
             }
         }.graphicsLayer(
-            transformOrigin = transformOrigin,
-            scaleX = updatedScale,
-            scaleY = updatedScale,
-            translationX = updatedTranslation.x,
-            translationY = updatedTranslation.y
+            transformOrigin = TransformOrigin(0f, 0f),
+            scaleX = updatedTransform.scale,
+            scaleY = updatedTransform.scale,
+            translationX = updatedTransform.translation.x,
+            translationY = updatedTransform.translation.y
         )
     }
 )
 
-private fun Offset.remap(
-    translation: Offset,
-    scale: Float,
-    transformOrigin: TransformOrigin
-) = (this - translation) / scale
+private fun Offset.remap(transformParameters: TransformParameters) =
+    (this - transformParameters.translation) / transformParameters.scale

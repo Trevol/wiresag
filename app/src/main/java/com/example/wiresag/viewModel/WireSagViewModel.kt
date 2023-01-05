@@ -15,7 +15,6 @@ import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
-import com.example.wiresag.exps.WireSagAnnotationTool2
 import com.example.wiresag.mapView.*
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
