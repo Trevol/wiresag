@@ -34,9 +34,10 @@ fun LayeredImage(
 fun TransformParameters.applyGesture(gesture: PanZoomGesture) =
     if (gesture.isReleaseEvent) {
         this
-    } else
+    } else {
         TransformParameters(
             translation = translation + gesture.pan + (gesture.centroid - translation) * (1 - gesture.zoom),
             scale = scale * gesture.zoom,
             gesture = gesture
         )
+    }
