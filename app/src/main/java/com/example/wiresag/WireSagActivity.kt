@@ -3,7 +3,6 @@ package com.example.wiresag
 import android.Manifest
 import android.os.Bundle
 import android.os.Environment
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Text
@@ -15,7 +14,6 @@ import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.WireSagViewModel
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
@@ -77,6 +75,7 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
                 initialDelay = 1000,
                 locationUpdateTime = 500
             )
+
             return locationProvider
         }
 

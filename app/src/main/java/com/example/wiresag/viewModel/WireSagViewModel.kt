@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.NativePaint
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
@@ -149,66 +150,103 @@ class WireSagViewModel(
         }
     }
 
+    // VIEWS ************************
     @Composable
-    fun View() {
-
+    fun WireSagAnnotation() {
         if (photoForAnnotation != null) {
             WireSagAnnotationTool(
                 modifier = Modifier
                     .fillMaxSize()
-                    .zIndex(2f),
+                    .zIndex(1f),
                 spanPhoto = photoForAnnotation!!,
                 onClose = { photoForAnnotation = null },
                 onDelete = {
-                    if (photoForAnnotation != null){
+                    if (photoForAnnotation != null) {
                         geoObjects.deleteSpanPhoto(photoForAnnotation!!)
                         photoForAnnotation = null
                     }
                 }
             )
         }
+    }
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f)) {
+    @Composable
+    fun MapControls() {
 
-                Row(modifier = Modifier.zIndex(1f)) {
-                    Spacer(Modifier.weight(1f))
+        @Composable
+        fun UpperButtons() {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 
-                    TransparentButton(
-                        onClick = { markPylon() },
-                        enabled = currentLocation != null
-                    ) {
-                        Icon(R.drawable.ic_outline_add_location_alt_24)
-                    }
-
-                    TransparentButton(
-                        onClick = { takePhotoWithLocation() },
-                        enabled = currentLocation != null && geoObjects.pylons.size > 1
-                    ) {
-                        Icon(R.drawable.ic_baseline_add_a_photo_24)
-                    }
+                TransparentButton(
+                    onClick = { markPylon() },
+                    enabled = currentLocation != null
+                ) {
+                    Icon(R.drawable.ic_outline_add_location_alt_24)
                 }
 
-                WireSagMap(
-                    modifier = Modifier.fillMaxSize(),
-                    onInitMapView = {
-                        it.controller.setZoom(15.0)
-                    },
-                    onUpdateMapView = ::updateMapView,
-                    onCanvasDraw = { mapCanvasDraw() }
-                )
+                TransparentButton(
+                    onClick = { takePhotoWithLocation() },
+                    enabled = currentLocation != null && geoObjects.pylons.size > 1
+                ) {
+                    Icon(R.drawable.ic_baseline_add_a_photo_24)
+                }
             }
-            LocationInfo(currentLocation, onClick = ::navigateToCurrentLocation)
         }
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(1f),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            UpperButtons()
+
+            LocationInfo(
+                currentLocation,
+                onClick = ::navigateToCurrentLocation
+            )
+        }
+
+    }
+
+    @Composable
+    fun Map() {
+        Box(modifier = Modifier.fillMaxSize()) {
+            MapControls()
+            WireSagMap(
+                modifier = Modifier.fillMaxSize(),
+                onInitMapView = {
+                    it.controller.setZoom(15.0)
+                },
+                onUpdateMapView = ::updateMapView,
+                onCanvasDraw = { mapCanvasDraw() }
+            )
+
+        }
+    }
+
+    @Composable
+    fun View() {
+        WireSagAnnotation()
+        Map()
     }
 }
 
 @Composable
-private fun LocationInfo(location: Location?, onClick: (Location?) -> Unit = {}) {
-    Row(Modifier.clickable { onClick(location) }, verticalAlignment = Alignment.CenterVertically) {
+private fun LocationInfo(
+    location: Location?,
+    modifier: Modifier = Modifier,
+    onClick: (Location?) -> Unit = {}
+) {
+    Row(
+        modifier
+            .padding(start = 4.dp)
+            .clickable { onClick(location) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         if (location == null) {
-            Icon(R.drawable.ic_outline_location_searching_12)
+            Icon(R.drawable.ic_outline_location_searching_24)
+            Text("Searching...")
         } else {
             Icon(R.drawable.ic_outline_my_location_12)
             Text(location.info(), fontSize = 10.sp)
