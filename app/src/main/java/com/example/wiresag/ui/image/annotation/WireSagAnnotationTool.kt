@@ -59,17 +59,12 @@ fun WireSagAnnotationTool(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-
-
                 Icon(Icons.Outlined.Refresh,
                     modifier = Modifier
                         .padding(ButtonDefaults.ContentPadding)
                         .background(Color(127, 127, 127, 100))
                         .clickable { spanPhoto.annotation.points.clear() }
                 )
-                /*TransparentButton(onClick = { spanPhoto.annotation.points.clear() }) {
-                    Icon(Icons.Outlined.Refresh)
-                }*/
 
                 Icon(Icons.Outlined.Delete,
                     modifier = Modifier
@@ -77,9 +72,6 @@ fun WireSagAnnotationTool(
                         .background(Color(127, 127, 127, 100))
                         .clickable { onDelete(spanPhoto) }
                 )
-                /*TransparentButton(onClick = { onDelete(spanPhoto) }) {
-                    Icon(Icons.Outlined.Delete)
-                }*/
             }
             Spacer(Modifier.weight(1f))
             SagInfo(spanPhoto)
