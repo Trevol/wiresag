@@ -23,6 +23,7 @@ import com.example.wiresag.ui.image.applyGesture
 import com.example.wiresag.ui.input.PanZoomGesture
 import com.example.wiresag.ui.input.TransformParameters
 import com.example.wiresag.utils.rememberMutableStateOf
+import java.time.LocalDateTime
 
 class TestActivity : FullScreenActivity(keepScreenOn = true) {
 
@@ -86,11 +87,20 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 modifier = Modifier.fillMaxSize(),
                 image = testBitmap().asImageBitmap(),
                 transform = transform,
-                onTransform = { transform = it },
+                onTransform = {
+                    //it.log()
+                    transform = it
+                },
                 onClick = { _, imagePosition -> clicks.add(imagePosition) }
             ) {
                 drawPoints(clicks, PointMode.Points, Color(0, 0, 0, 120), 10 * transform.scale)
             }
         }
     }
+}
+
+private fun TransformParameters.log() {
+    val stamp = LocalDateTime.now().let { "${it.second}.${it.minute}.${it.hour}" }
+    println("---------------------")
+    println("$stamp: tr: $translation  pan: ${gesture?.pan}(${gesture?.pan?.getDistanceSquared()})")
 }
