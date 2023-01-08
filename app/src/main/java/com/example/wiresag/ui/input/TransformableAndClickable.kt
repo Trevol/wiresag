@@ -69,11 +69,11 @@ fun Modifier.transformableAndClickable(
                     if (firstReleaseAfterPress && event.changes.isNotEmpty()) {
                         val change = event.changes.first()
                         val rawPosition = change.position
-                        val remappedPosition = rawPosition.remap(updatedTransform)
+                        val layerPosition = rawPosition.transform(updatedTransform)
                         if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
-                            updatedOnClick(PointerInputPositions(rawPosition, remappedPosition))
+                            updatedOnClick(PointerInputPositions(rawPosition, layerPosition))
                         } else {
-                            updatedOnLongClick(PointerInputPositions(rawPosition, remappedPosition))
+                            updatedOnLongClick(PointerInputPositions(rawPosition, layerPosition))
                         }
                     }
 
@@ -89,5 +89,5 @@ fun Modifier.transformableAndClickable(
     }
 )
 
-private fun Offset.remap(transformParameters: TransformParameters) =
-    (this - transformParameters.translation) / transformParameters.scale
+private fun Offset.transform(transform: TransformParameters) =
+    (this - transform.translation) / transform.scale
