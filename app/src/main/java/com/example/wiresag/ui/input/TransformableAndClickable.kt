@@ -12,9 +12,7 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 
-typealias RemappedClick = (position: Offset, layerPosition: Offset) -> Unit
-
-val NoRemappedClick: RemappedClick = { _, _ -> }
+data class PointerInputPositions(val position: Offset, val layerPosition: Offset)
 
 data class PanZoomGesture(
     val pan: Offset,
@@ -35,8 +33,8 @@ data class TransformParameters(
 fun Modifier.transformableAndClickable(
     transform: TransformParameters,
     onGesture: (PanZoomGesture) -> Unit,
-    onClick: RemappedClick = NoRemappedClick,
-    onLongClick: RemappedClick = NoRemappedClick
+    onClick: (PointerInputPositions) -> Unit = {},
+    onLongClick: (PointerInputPositions) -> Unit = {},
 ) = composed(
     factory = {
         val updatedTransform by rememberUpdatedState(transform)
@@ -73,9 +71,9 @@ fun Modifier.transformableAndClickable(
                         val rawPosition = change.position
                         val remappedPosition = rawPosition.remap(updatedTransform)
                         if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
-                            updatedOnClick(rawPosition, remappedPosition)
+                            updatedOnClick(PointerInputPositions(rawPosition, remappedPosition))
                         } else {
-                            updatedOnLongClick(rawPosition, remappedPosition)
+                            updatedOnLongClick(PointerInputPositions(rawPosition, remappedPosition))
                         }
                     }
 

@@ -13,8 +13,8 @@ fun LayeredImage(
     image: ImageBitmap,
     transform: TransformParameters = TransformParameters(),
     onTransform: (TransformParameters) -> Unit = {},
-    onClick: RemappedClick = NoRemappedClick,
-    onLongClick: RemappedClick = NoRemappedClick,
+    onClick: (PointerInputPositions) -> Unit = {},
+    onLongClick: (PointerInputPositions) -> Unit = {},
     onLayerDraw: DrawScope.() -> Unit
 ) {
     Canvas(

@@ -91,7 +91,7 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                     //it.log()
                     transform = it
                 },
-                onClick = { _, imagePosition -> clicks.add(imagePosition) }
+                onClick = { clicks.add(it.layerPosition) }
             ) {
                 drawPoints(clicks, PointMode.Points, Color(0, 0, 0, 120), 10 * transform.scale)
             }

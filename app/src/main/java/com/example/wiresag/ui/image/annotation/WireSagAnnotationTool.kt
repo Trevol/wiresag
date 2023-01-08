@@ -91,9 +91,7 @@ fun WireSagAnnotationTool(
             image = imageBitmap,
             transform = transform,
             onTransform = { transform = it },
-            onClick = { _, imgPosition ->
-                spanPhoto.annotation.tryAddOrReplace(imgPosition)
-            }
+            onClick = { spanPhoto.annotation.tryAddOrReplace(it.layerPosition) }
         ) {
             drawAnnotation(spanPhoto, transform.scale)
         }
