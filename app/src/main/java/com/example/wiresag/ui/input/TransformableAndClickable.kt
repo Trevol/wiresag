@@ -1,5 +1,6 @@
 package com.example.wiresag.ui.input
 
+
 import androidx.compose.foundation.gestures.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
@@ -23,6 +24,7 @@ data class PanZoomGesture(
 )
 
 val PanZoomGesture.isReleaseEvent get() = type == PointerEventType.Release
+val PanZoomGesture.isSmallPan get() = zoom == 1f && pan.getDistanceSquared() <= 9f
 
 data class TransformParameters(
     val translation: Offset = Offset.Zero,
@@ -45,32 +47,40 @@ fun Modifier.transformableAndClickable(
         pointerInput(Unit) {
             forEachGesture {
                 awaitPointerEventScope {
-                    awaitFirstDown()
+                    val firstDown = awaitFirstDown()
 
                     var event: PointerEvent
-                    var firstReleaseAfterPress = true
+                    var isTransformEventSequence = false
+                    val smallPans = mutableListOf<PanZoomGesture>()
 
                     do {
                         event = awaitPointerEvent()
-                        updatedOnGesture(
-                            PanZoomGesture(
-                                pan = event.calculatePan(),
-                                zoom = event.calculateZoom(),
-                                centroid = event.calculateCentroid(),
-                                centroidSize = event.calculateCentroidSize(),
-                                type = event.type
-                            ),
-                        )
-                        if (event.type != PointerEventType.Release) {
-                            firstReleaseAfterPress = false
-                        }
-                    } while (event.type != PointerEventType.Release)
 
-                    if (firstReleaseAfterPress && event.changes.isNotEmpty()) {
+                        val gesture = PanZoomGesture(
+                            pan = event.calculatePan(),
+                            zoom = event.calculateZoom(),
+                            centroid = event.calculateCentroid(),
+                            centroidSize = event.calculateCentroidSize(),
+                            type = event.type
+                        )
+                        if (isTransformEventSequence) {
+                            updatedOnGesture(gesture)
+                        } else {
+                            if (gesture.isSmallPan) {
+                                smallPans.add(gesture)
+                            } else {
+                                isTransformEventSequence = true
+                                smallPans.forEach(updatedOnGesture)
+                                updatedOnGesture(gesture)
+                            }
+                        }
+                    } while (!gesture.isReleaseEvent)
+
+                    if (!isTransformEventSequence && event.changes.isNotEmpty()) {
                         val change = event.changes.first()
                         val rawPosition = change.position
                         val layerPosition = rawPosition.transform(updatedTransform)
-                        if (change.uptimeMillis - change.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
+                        if (change.uptimeMillis - firstDown.previousUptimeMillis < viewConfiguration.longPressTimeoutMillis) {
                             updatedOnClick(PointerInputPositions(rawPosition, layerPosition))
                         } else {
                             updatedOnLongClick(PointerInputPositions(rawPosition, layerPosition))

@@ -91,9 +91,10 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                     //it.log()
                     transform = it
                 },
-                onClick = { clicks.add(it.layerPosition) }
+                onClick = { clicks.add(it.layerPosition) },
+                onLongClick = { clicks.clear() }
             ) {
-                drawPoints(clicks, PointMode.Points, Color(0, 0, 0, 120), 10 * transform.scale)
+                clicks.forEach { drawCircle(Color(0, 0, 0, 120), 3 / transform.scale, it) }
             }
         }
     }
