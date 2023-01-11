@@ -87,10 +87,7 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
                 modifier = Modifier.fillMaxSize(),
                 image = testBitmap().asImageBitmap(),
                 transform = transform,
-                onTransform = {
-                    //it.log()
-                    transform = it
-                },
+                onTransform = { transform = it },
                 onClick = { clicks.add(it.layerPosition) },
                 onLongClick = { clicks.clear() }
             ) {
@@ -100,8 +97,3 @@ class TestActivity : FullScreenActivity(keepScreenOn = true) {
     }
 }
 
-private fun TransformParameters.log() {
-    val stamp = LocalDateTime.now().let { "${it.second}.${it.minute}.${it.hour}" }
-    println("---------------------")
-    println("$stamp: tr: $translation  pan: ${gesture?.pan}(${gesture?.pan?.getDistanceSquared()})")
-}
