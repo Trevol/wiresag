@@ -12,10 +12,13 @@ import com.example.wiresag.osmdroid.enableScaleBar
 import com.example.wiresag.utils.addTo
 import org.osmdroid.views.MapView
 
-class WireSagMapView(context: Context, onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}) :
-    MapView(context) {
-
-    val canvas = CanvasOverlay(onCanvasDraw).addTo(overlays)
+class WireSagMapView(
+    context: Context,
+    onSingleTapConfirmed: OverlayMotionEvent? = null,
+    onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
+) : MapView(context) {
+    val canvas = CanvasOverlay(onDraw = onCanvasDraw, onSingleTapConfirmed = onSingleTapConfirmed)
+        .addTo(overlays)
 
     init {
         setMultiTouchControls(true)
@@ -29,15 +32,23 @@ fun WireSagMap(
     modifier: Modifier = Modifier,
     onInitMapView: (map: WireSagMapView) -> Unit = {},
     onUpdateMapView: (map: WireSagMapView) -> Unit = {},
+    onSingleTapConfirmed: OverlayMotionEvent? = null,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) {
     MapView(
         modifier,
-        factory = { context -> WireSagMapView(context, onCanvasDraw) },
+        factory = { context ->
+            WireSagMapView(
+                context = context,
+                onSingleTapConfirmed = onSingleTapConfirmed,
+                onCanvasDraw = onCanvasDraw
+            )
+        },
         onInitMapView,
         {
             it.canvas.evaluateDrawDependencies()
             onUpdateMapView(it)
+            it.postInvalidate()
         }
     )
 }

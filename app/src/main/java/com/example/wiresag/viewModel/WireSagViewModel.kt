@@ -69,7 +69,6 @@ class WireSagViewModel(
             map.controller.animateTo(GeoPoint(currentLocation!!), 19.5, null)
             prevLocation = currentLocation // animate only once!!!
         }
-        map.postInvalidate()
     }
 
     private object Paints {

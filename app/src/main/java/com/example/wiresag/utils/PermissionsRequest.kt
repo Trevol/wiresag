@@ -2,12 +2,13 @@ package com.example.wiresag.utils
 
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 class PermissionsRequest(private val parent: ComponentActivity, vararg val permissions: String) {
     private var requestResult: (granted: Boolean) -> Unit = {}
-    private val request =
+    private val request: ActivityResultLauncher<Array<String>> =
         parent.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.all { it.value }
             requestResult(granted)
