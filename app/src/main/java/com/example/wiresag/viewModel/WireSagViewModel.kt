@@ -87,6 +87,11 @@ class WireSagViewModel(
             strokeWidth = 0f
             color = Color.argb(127, 0, 0, 0)
         }
+        val photo = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 0f
+            color = Color.argb(255, 0, 200, 0)
+        }
         val normal = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
             strokeWidth = 0f
@@ -114,6 +119,11 @@ class WireSagViewModel(
                 .map { it.toPixelF() }
                 .forEach { px ->
                     canvas.drawCircle(px.x, px.y, 5f, Paints.placeForPhoto)
+                }
+            span.photos
+                .map { it.photoWithGeoPoint.geoPoint.toPixelF() }
+                .forEach { px ->
+                    canvas.drawCircle(px.x, px.y, 7f, Paints.photo)
                 }
         }
 
