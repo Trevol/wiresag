@@ -1,11 +1,9 @@
 package com.example.wiresag.mapView
 
 import android.content.Context
-import android.content.res.Resources
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.core.graphics.drawable.toDrawable
-import com.example.wiresag.osmdroid.SimpleLocationOverlay2
 import com.example.wiresag.osmdroid.compose.MapView
 import com.example.wiresag.osmdroid.enableRotationGesture
 import com.example.wiresag.osmdroid.enableScaleBar
@@ -15,10 +13,14 @@ import org.osmdroid.views.MapView
 class WireSagMapView(
     context: Context,
     onSingleTapConfirmed: OverlayMotionEvent? = null,
+    onLongPress: OverlayMotionEvent?,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) : MapView(context) {
-    val canvas = CanvasOverlay(onDraw = onCanvasDraw, onSingleTapConfirmed = onSingleTapConfirmed)
-        .addTo(overlays)
+    val canvas = CanvasOverlay(
+        onDraw = onCanvasDraw,
+        onSingleTapConfirmed = onSingleTapConfirmed,
+        onLongPress = onLongPress
+    ).addTo(overlays)
 
     init {
         setMultiTouchControls(true)
@@ -33,19 +35,21 @@ fun WireSagMap(
     onInitMapView: (map: WireSagMapView) -> Unit = {},
     onUpdateMapView: (map: WireSagMapView) -> Unit = {},
     onSingleTapConfirmed: OverlayMotionEvent? = null,
+    onLongPress: OverlayMotionEvent?,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) {
     MapView(
-        modifier,
+        modifier = modifier,
         factory = { context ->
             WireSagMapView(
                 context = context,
                 onSingleTapConfirmed = onSingleTapConfirmed,
+                onLongPress = onLongPress,
                 onCanvasDraw = onCanvasDraw
             )
         },
-        onInitMapView,
-        {
+        onInitMapView = onInitMapView,
+        onUpdateMapView = {
             it.canvas.evaluateDrawDependencies()
             onUpdateMapView(it)
             it.postInvalidate()

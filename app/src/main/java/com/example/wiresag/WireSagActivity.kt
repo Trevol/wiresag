@@ -74,7 +74,7 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
-                locationUpdateTime = 500
+                locationUpdateTime = 3000
             )
 
             return locationProvider

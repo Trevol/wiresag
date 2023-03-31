@@ -3,6 +3,7 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -153,7 +154,7 @@ class WireSagViewModel(
         }
     }
 
-    private fun navigateToCurrentLocation(location: Location?) {
+    private fun navigateToLocation(location: Location?) {
         if (location != null) {
             //TODO: Navigate!!! How?
         }
@@ -212,7 +213,7 @@ class WireSagViewModel(
 
             LocationInfo(
                 currentLocation,
-                onClick = ::navigateToCurrentLocation
+                onClick = ::navigateToLocation
             )
         }
 
@@ -228,6 +229,8 @@ class WireSagViewModel(
                     it.controller.setZoom(15.0)
                 },
                 onUpdateMapView = ::updateMapView,
+                onSingleTapConfirmed = { true },
+                onLongPress = { true },
                 onCanvasDraw = { mapCanvasDraw() }
             )
 
