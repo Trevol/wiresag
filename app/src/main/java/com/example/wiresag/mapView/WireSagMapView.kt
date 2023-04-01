@@ -3,6 +3,8 @@ package com.example.wiresag.mapView
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.wiresag.mapView.overlays.CanvasOverlay
+import com.example.wiresag.mapView.overlays.MapViewMotionEvent
 import com.example.wiresag.osmdroid.compose.MapView
 import com.example.wiresag.osmdroid.enableRotationGesture
 import com.example.wiresag.osmdroid.enableScaleBar

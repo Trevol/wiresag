@@ -3,7 +3,6 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -18,6 +17,7 @@ import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.*
+import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.state.PhotoWithGeoPoint
