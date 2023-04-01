@@ -1,7 +1,6 @@
 package com.example.wiresag.mapView
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.wiresag.osmdroid.compose.MapView
@@ -12,8 +11,8 @@ import org.osmdroid.views.MapView
 
 class WireSagMapView(
     context: Context,
-    onSingleTapConfirmed: OverlayMotionEvent? = null,
-    onLongPress: OverlayMotionEvent?,
+    onSingleTapConfirmed: MapViewMotionEvent? = null,
+    onLongPress: MapViewMotionEvent?,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) : MapView(context) {
     val canvas = CanvasOverlay(
@@ -34,8 +33,8 @@ fun WireSagMap(
     modifier: Modifier = Modifier,
     onInitMapView: (map: WireSagMapView) -> Unit = {},
     onUpdateMapView: (map: WireSagMapView) -> Unit = {},
-    onSingleTapConfirmed: OverlayMotionEvent? = null,
-    onLongPress: OverlayMotionEvent?,
+    onSingleTapConfirmed: MapViewMotionEvent? = null,
+    onLongPress: MapViewMotionEvent?,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) {
     MapView(
@@ -50,7 +49,7 @@ fun WireSagMap(
         },
         onInitMapView = onInitMapView,
         onUpdateMapView = {
-            it.canvas.evaluateDrawDependencies()
+            it.canvas.evaluateDependencies()
             onUpdateMapView(it)
             it.postInvalidate()
         }
