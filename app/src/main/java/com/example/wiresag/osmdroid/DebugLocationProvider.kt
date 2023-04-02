@@ -1,12 +1,13 @@
 package com.example.wiresag.osmdroid
 
 import android.location.Location
+import com.example.wiresag.location.Location
 import kotlinx.coroutines.*
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import kotlin.random.Random
 
-class DummyLocationProvider(
+class DebugLocationProvider(
     val latDelta: Double = 0.000006,
     val lonDelta: Double = 0.000007,
     val initialDelay: Long = 5000,
@@ -23,15 +24,14 @@ class DummyLocationProvider(
             delay(initialDelay)
             while (true) {
                 val newLocation = lastLocation?.let {
-                    Location("dummy").apply {
-                        latitude = it.latitude + latDelta
-                        longitude = it.longitude + lonDelta
-                        accuracy = 111.1f + Random.nextFloat()
-                    }
+                    Location(it.latitude + latDelta, it.longitude + lonDelta)
+                        .apply {
+                            accuracy = 111.1f + Random.nextFloat()
+                        }
                 } ?: dummyLocation()
                 lastLocation = newLocation
                 withContext(Dispatchers.Main) {
-                    myLocationConsumer?.onLocationChanged(lastLocation, this@DummyLocationProvider)
+                    myLocationConsumer?.onLocationChanged(lastLocation, this@DebugLocationProvider)
                 }
                 delay(locationUpdateTime)
             }
@@ -52,12 +52,6 @@ class DummyLocationProvider(
     override fun destroy() {
         stopLocationProvider()
     }
-
-    companion object {
-        fun dummyLocation() = Location("dummy").apply {
-            latitude = 45.017983
-            longitude = 35.380281
-            accuracy = 111.1f
-        }
-    }
 }
+
+fun dummyLocation() = Location(45.017983, 35.380281)

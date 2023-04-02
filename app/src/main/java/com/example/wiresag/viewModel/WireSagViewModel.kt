@@ -18,6 +18,8 @@ import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.*
 import com.example.wiresag.mapView.overlays.CanvasOverlay
+import com.example.wiresag.mapView.overlays.MapViewMotionEvent
+import com.example.wiresag.osmdroid.StubLocationProvider
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.state.PhotoWithGeoPoint
@@ -160,6 +162,14 @@ class WireSagViewModel(
         }
     }
 
+    private fun initLongPressHandler(): MapViewMotionEvent? =
+        if (locationProvider is StubLocationProvider) {
+            {
+                currentLocation = it.geoPoint.let { Location(it.latitude, it.longitude) }
+                true
+            }
+        } else null
+
     // VIEWS ************************
     @Composable
     fun WireSagAnnotation() {
@@ -230,7 +240,7 @@ class WireSagViewModel(
                 },
                 onUpdateMapView = ::updateMapView,
                 onSingleTapConfirmed = { true },
-                onLongPress = { true },
+                onLongPress = initLongPressHandler(),
                 onCanvasDraw = { mapCanvasDraw() }
             )
 

@@ -9,12 +9,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.remember
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
-import com.example.wiresag.osmdroid.DummyLocationProvider
+import com.example.wiresag.osmdroid.DebugLocationProvider
+import com.example.wiresag.osmdroid.StubLocationProvider
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.WireSagViewModel
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
@@ -70,12 +70,14 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
                     locationUpdateMinTime = 500
                 }*/
 
-            val locationProvider = DummyLocationProvider(
+            /*val locationProvider = DebugLocationProvider(
                 //initialLocation = null,
                 //latDelta = 0.0,
                 initialDelay = 1000,
                 locationUpdateTime = 1000
-            )
+            )*/
+
+            val locationProvider = StubLocationProvider()
 
             return locationProvider
         }
