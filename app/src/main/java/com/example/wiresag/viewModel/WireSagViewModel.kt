@@ -3,6 +3,7 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -19,6 +20,7 @@ import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.mapView.*
 import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.mapView.overlays.MapViewMotionEvent
+import com.example.wiresag.mapView.overlays.MapViewMotionEventScope
 import com.example.wiresag.osmdroid.StubLocationProvider
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
@@ -93,7 +95,7 @@ class WireSagViewModel(
         val photo = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
             strokeWidth = 0f
-            color = Color.argb(255, 0, 200, 0)
+            color = Color.argb(255, 200, 0, 0)
         }
         val normal = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
@@ -126,7 +128,7 @@ class WireSagViewModel(
             span.photos
                 .map { it.photoWithGeoPoint.geoPoint.toPixelF() }
                 .forEach { px ->
-                    canvas.drawCircle(px.x, px.y, 7f, Paints.photo)
+                    canvas.drawCircle(px.x, px.y, 10f, Paints.photo)
                 }
         }
 
@@ -156,6 +158,12 @@ class WireSagViewModel(
         }
     }
 
+    private fun onSingleTapConfirmed(d: MapViewMotionEventScope): Boolean {
+        val tappedPhoto = geoObjects.nearestSpanPhoto(d.geoPoint, maxDistance = 3.0)
+        photoForAnnotation = tappedPhoto
+        return tappedPhoto != null
+    }
+
     private fun navigateToLocation(location: Location?) {
         if (location != null) {
             //TODO: Navigate!!! How?
@@ -165,6 +173,7 @@ class WireSagViewModel(
     private fun initLongPressHandler(): MapViewMotionEvent? =
         if (locationProvider is StubLocationProvider) {
             {
+                Log.d("DDD_DDD", "LONG PRESS")
                 currentLocation = it.geoPoint.let { Location(it.latitude, it.longitude) }
                 true
             }
@@ -239,7 +248,7 @@ class WireSagViewModel(
                     it.controller.setZoom(15.0)
                 },
                 onUpdateMapView = ::updateMapView,
-                onSingleTapConfirmed = { true },
+                onSingleTapConfirmed = ::onSingleTapConfirmed,
                 onLongPress = initLongPressHandler(),
                 onCanvasDraw = { mapCanvasDraw() }
             )

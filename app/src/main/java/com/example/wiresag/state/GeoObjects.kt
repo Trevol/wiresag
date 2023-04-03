@@ -3,6 +3,7 @@ package com.example.wiresag.state
 import androidx.compose.runtime.mutableStateListOf
 import com.example.wiresag.location.nearest
 import com.example.wiresag.utils.addItem
+import org.osmdroid.api.IGeoPoint
 import org.osmdroid.util.GeoPoint
 
 class GeoObjects {
@@ -24,6 +25,9 @@ class GeoObjects {
 
     fun nearestWireSpan(geoPoint: GeoPoint, maxDistance: Double) =
         spans.nearest(geoPoint, maxDistance)?.item
+
+    fun nearestSpanPhoto(geoPoint: GeoPoint, maxDistance: Double) =
+        spans.flatMap { it.photos }.nearest(geoPoint, maxDistance)?.item
 
     fun deleteSpanPhoto(photoForAnnotation: WireSpanPhoto) {
         photoForAnnotation.span.photos.remove(photoForAnnotation)

@@ -3,15 +3,18 @@ package com.example.wiresag.state
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
+import com.example.wiresag.location.GeoPointAware
 import com.example.wiresag.math.pow2
 import com.example.wiresag.math.squareDistance
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.utils.LimitedSnapshotStateList
+import org.osmdroid.util.GeoPoint
 
 data class WireSpanPhoto(
     val span: WireSpan,
     val photoWithGeoPoint: PhotoWithGeoPoint
-) {
+) : GeoPointAware by photoWithGeoPoint {
+
     val annotation = Annotation(this)
 
     val estimatedWireSag by derivedStateOf {
@@ -22,7 +25,8 @@ data class WireSpanPhoto(
         }
     }
 
-    class Annotation(val spanPhoto: WireSpanPhoto) {
+    class Annotation(private val spanPhoto: WireSpanPhoto) {
+
         val points = LimitedSnapshotStateList<Offset>(maxSize = 3)
 
         val triangle by derivedStateOf {
