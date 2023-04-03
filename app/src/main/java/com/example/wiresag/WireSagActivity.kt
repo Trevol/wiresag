@@ -11,6 +11,7 @@ import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
 import com.example.wiresag.osmdroid.DebugLocationProvider
 import com.example.wiresag.osmdroid.StubLocationProvider
+import com.example.wiresag.storage.image.InMemoryImageStorage
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
@@ -83,6 +84,11 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         }
 
 
-        fun viewModel() = WireSagViewModel(context, locationProvider(), photoRequest)
+        fun viewModel() = WireSagViewModel(
+            context,
+            locationProvider(),
+            photoRequest,
+            InMemoryImageStorage()
+        )
     }
 }

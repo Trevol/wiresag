@@ -1,5 +1,6 @@
 package com.example.wiresag.ui.image.annotation
 
+import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -27,6 +29,7 @@ import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.image.LayeredImage
+import com.example.wiresag.ui.image.rect
 import com.example.wiresag.ui.input.TransformParameters
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
@@ -39,8 +42,11 @@ fun WireSagAnnotationTool(
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     var transform by rememberMutableStateOf(TransformParameters())
-    val imageBitmap = spanPhoto.photoWithGeoPoint.photo.asImageBitmap()
+    val photo: Bitmap = TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
 
+    LaunchedEffect(key1 = Unit) {
+        TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
+    }
     BackHandler(onBack = { onClose() })
     Box(modifier = modifier.background(Color.White)) {
 
@@ -79,10 +85,15 @@ fun WireSagAnnotationTool(
 
         LayeredImage(
             modifier = Modifier.fillMaxSize(),
-            image = imageBitmap,
+            image = photo.asImageBitmap(),
             transform = transform,
             onTransform = { transform = it },
-            onClick = { spanPhoto.annotation.tryAddOrReplace(it.layerPosition) }
+            onClick = {
+                val pointOnImage = it.layerPosition
+                if (photo.rect.contains(pointOnImage)) {
+                    spanPhoto.annotation.tryAddOrReplace(pointOnImage)
+                }
+            }
         ) {
             drawAnnotation(spanPhoto, transform.scale)
         }

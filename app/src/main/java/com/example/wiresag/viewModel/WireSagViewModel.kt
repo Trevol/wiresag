@@ -26,6 +26,7 @@ import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.GeoObjects
 import com.example.wiresag.state.PhotoWithGeoPoint
 import com.example.wiresag.state.WireSpanPhoto
+import com.example.wiresag.storage.image.ImageStorage
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
@@ -37,7 +38,8 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 class WireSagViewModel(
     applicationContext: Context,
     private val locationProvider: IMyLocationProvider,
-    private val photoRequest: PhotoRequest
+    private val photoRequest: PhotoRequest,
+    private val imageStorage: ImageStorage
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private val currentGeoPoint by derivedStateOf { currentLocation?.toGeoPoint() }
@@ -153,8 +155,10 @@ class WireSagViewModel(
             val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
             val span = geoObjects.nearestWireSpan(currentGeoPoint, maxDistanceFromPhotoToSpan)
                 ?: return@takePhoto
-            photoForAnnotation =
-                span.photos.addItem(WireSpanPhoto(span, PhotoWithGeoPoint(photo, currentGeoPoint)))
+            val photoId = imageStorage.save(photo)
+            photoForAnnotation = span.photos.addItem(
+                WireSpanPhoto(span, PhotoWithGeoPoint(photoId, currentGeoPoint))
+            )
         }
     }
 
