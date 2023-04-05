@@ -14,10 +14,8 @@ class InMemoryImageStorage : ImageStorage {
         return id
     }
 
-    override fun update(id: String, image: Bitmap): Boolean {
-        val imageExists = images.containsKey(id)
+    override fun update(id: String, image: Bitmap) {
         images[id] = image
-        return imageExists
     }
 
     override fun delete(id: String): Boolean {
@@ -29,3 +27,4 @@ class InMemoryImageStorage : ImageStorage {
     }
 
 }
+

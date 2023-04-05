@@ -1,20 +1,20 @@
 package com.example.wiresag.ui.image.annotation
 
 import android.graphics.Bitmap
+import android.provider.Contacts.Intents.UI
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -31,6 +31,7 @@ import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.ui.input.TransformParameters
+import com.example.wiresag.ui.stopClickPropagation
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
 
@@ -38,67 +39,97 @@ import com.example.wiresag.utils.round
 fun WireSagAnnotationTool(
     modifier: Modifier,
     spanPhoto: WireSpanPhoto,
+    imageById: (String) -> Bitmap?,
+    onClose: () -> Unit,
+    onDelete: (WireSpanPhoto) -> Unit
+) {
+    val photo = imageById(spanPhoto.photoWithGeoPoint.photoId)
+
+    /*LaunchedEffect(Unit) {
+        TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
+    }*/
+    BackHandler(onBack = { onClose() })
+    Box(
+        modifier = modifier
+            .background(Color.White)
+            .stopClickPropagation()
+    ) {
+        if (photo != null) {
+            Annotation(spanPhoto, photo, onClose, onDelete)
+        } else {
+            ImageNotFound(spanPhoto.photoWithGeoPoint.photoId, onClose)
+        }
+
+    }
+
+}
+
+@Composable
+fun Annotation(
+    spanPhoto: WireSpanPhoto,
+    photo: Bitmap,
     onClose: () -> Unit,
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     var transform by rememberMutableStateOf(TransformParameters())
-    val photo: Bitmap = TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .zIndex(1f)
+    ) {
+        Row {
+            Icon(Icons.Outlined.Done,
+                modifier = Modifier
+                    .padding(ButtonDefaults.ContentPadding)
+                    .background(Color(127, 127, 127, 100))
+                    .clickable { onClose() }
+            )
 
-    LaunchedEffect(key1 = Unit) {
-        TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
-    }
-    BackHandler(onBack = { onClose() })
-    Box(modifier = modifier.background(Color.White)) {
+            Spacer(modifier = Modifier.weight(1f))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(1f)
-        ) {
-            Row {
-                Icon(Icons.Outlined.Done,
-                    modifier = Modifier
-                        .padding(ButtonDefaults.ContentPadding)
-                        .background(Color(127, 127, 127, 100))
-                        .clickable { onClose() }
-                )
+            Icon(Icons.Outlined.Refresh,
+                modifier = Modifier
+                    .padding(ButtonDefaults.ContentPadding)
+                    .background(Color(127, 127, 127, 100))
+                    .clickable { spanPhoto.annotation.points.clear() }
+            )
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                Icon(Icons.Outlined.Refresh,
-                    modifier = Modifier
-                        .padding(ButtonDefaults.ContentPadding)
-                        .background(Color(127, 127, 127, 100))
-                        .clickable { spanPhoto.annotation.points.clear() }
-                )
-
-                Icon(Icons.Outlined.Delete,
-                    modifier = Modifier
-                        .padding(ButtonDefaults.ContentPadding)
-                        .background(Color(127, 127, 127, 100))
-                        .clickable { onDelete(spanPhoto) }
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            SagInfo(spanPhoto)
+            Icon(Icons.Outlined.Delete,
+                modifier = Modifier
+                    .padding(ButtonDefaults.ContentPadding)
+                    .background(Color(127, 127, 127, 100))
+                    .clickable { onDelete(spanPhoto) }
+            )
         }
-
-        LayeredImage(
-            modifier = Modifier.fillMaxSize(),
-            image = photo.asImageBitmap(),
-            transform = transform,
-            onTransform = { transform = it },
-            onClick = {
-                val pointOnImage = it.layerPosition
-                if (photo.rect.contains(pointOnImage)) {
-                    spanPhoto.annotation.tryAddOrReplace(pointOnImage)
-                }
-            }
-        ) {
-            drawAnnotation(spanPhoto, transform.scale)
-        }
+        Spacer(Modifier.weight(1f))
+        SagInfo(spanPhoto)
     }
 
+    LayeredImage(
+        modifier = Modifier.fillMaxSize(),
+        image = photo.asImageBitmap(),
+        transform = transform,
+        onTransform = { transform = it },
+        onClick = {
+            val pointOnImage = it.layerPosition
+            if (photo.rect.contains(pointOnImage)) {
+                spanPhoto.annotation.tryAddOrReplace(pointOnImage)
+            }
+        }
+    ) {
+        drawAnnotation(spanPhoto, transform.scale)
+    }
+}
+
+
+@Composable
+private fun ImageNotFound(imageId: String, onClose: () -> Unit) = Row {
+    Icon(Icons.Outlined.ArrowBack,
+        modifier = Modifier
+            .padding(ButtonDefaults.ContentPadding)
+            .clickable { onClose() }
+    )
+    Text("Image ($imageId) not found")
 }
 
 @Composable

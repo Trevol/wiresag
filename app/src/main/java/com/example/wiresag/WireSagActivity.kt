@@ -9,9 +9,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.remember
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
-import com.example.wiresag.osmdroid.DebugLocationProvider
 import com.example.wiresag.osmdroid.StubLocationProvider
-import com.example.wiresag.storage.image.InMemoryImageStorage
+import com.example.wiresag.storage.image.FileImageStorage
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
@@ -55,12 +54,12 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
     }
 
     private class Services(val context: ComponentActivity) {
+        val imagesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            ?: File(context.filesDir, "Pictures").also { it.mkdirs() }
+
         val photoRequest = CameraPhotoRequest(
             context,
-            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: File(
-                context.filesDir,
-                "Pictures"
-            ).also { it.mkdirs() },
+            File(imagesDirectory, "photoRequestTmp").apply { mkdirs() },
             "wiresag_authority"
         )
 
@@ -88,7 +87,9 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
             context,
             locationProvider(),
             photoRequest,
-            InMemoryImageStorage()
+            FileImageStorage(
+                storageDirectory = File(imagesDirectory, "spans").apply { mkdirs() }
+            )
         )
     }
 }

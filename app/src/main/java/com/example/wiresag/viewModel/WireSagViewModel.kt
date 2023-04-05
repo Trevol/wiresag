@@ -177,7 +177,6 @@ class WireSagViewModel(
     private fun initLongPressHandler(): MapViewMotionEvent? =
         if (locationProvider is StubLocationProvider) {
             {
-                Log.d("DDD_DDD", "LONG PRESS")
                 currentLocation = it.geoPoint.let { Location(it.latitude, it.longitude) }
                 true
             }
@@ -192,10 +191,14 @@ class WireSagViewModel(
                     .fillMaxSize()
                     .zIndex(1f),
                 spanPhoto = photoForAnnotation!!,
-                onClose = { photoForAnnotation = null },
+                imageById = { imageStorage.read(it) },
+                onClose = {
+                    photoForAnnotation = null
+                },
                 onDelete = {
                     if (photoForAnnotation != null) {
                         geoObjects.deleteSpanPhoto(photoForAnnotation!!)
+                        imageStorage.delete(photoForAnnotation!!.photoWithGeoPoint.photoId)
                         photoForAnnotation = null
                     }
                 }

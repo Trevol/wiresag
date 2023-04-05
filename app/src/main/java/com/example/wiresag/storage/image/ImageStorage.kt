@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 interface ImageStorage {
     fun read(id: String): Bitmap?
     fun save(image: Bitmap): String
-    fun update(id: String, image: Bitmap): Boolean
+    fun update(id: String, image: Bitmap)
     fun delete(id: String): Boolean
 }
 

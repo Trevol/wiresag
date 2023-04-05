@@ -15,14 +15,14 @@ interface PhotoRequest {
 
 class CameraPhotoRequest(
     val context: ComponentActivity,
-    val imagesDirectory: File,
+    val tmpImagesDirectory: File,
     val authority: String,
     val tmpFilePrefix: () -> String = { "tmp_" }
 ) : PhotoRequest {
     val action = context.registerTakePictureAction()
 
     override fun takePhoto(photo: (Bitmap?) -> Unit) {
-        val imageFile = File.createTempFile(tmpFilePrefix(), ".jpg", imagesDirectory)
+        val imageFile = File.createTempFile(tmpFilePrefix(), ".jpg", tmpImagesDirectory)
         action(FileProvider.getUriForFile(context, authority, imageFile)) { taken ->
             val bmp = if (taken) {
                 imageFile.inputStream().use { BitmapFactory.decodeStream(it) }
