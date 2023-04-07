@@ -12,9 +12,10 @@ data class WireSpan(
 ) : GeoPointAware {
     override val geoPoint: GeoPoint get() = midpoint
 
+    val photos = mutableStateListOf<WireSpanPhoto>()
+
     val length by lazy { pylon1.geoPoint.distanceToAsDouble(pylon2.geoPoint).toFloat() }
     val midpoint by lazy { pylon1.geoPoint.midpoint(pylon2.geoPoint) }
-    val photos = mutableStateListOf<WireSpanPhoto>()
     val photoLine by lazy { PhotoLine(this) }
 
     class PhotoLine(span: WireSpan) {

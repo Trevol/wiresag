@@ -3,7 +3,6 @@ package com.example.wiresag.viewModel
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -23,10 +22,8 @@ import com.example.wiresag.mapView.overlays.MapViewMotionEvent
 import com.example.wiresag.mapView.overlays.MapViewMotionEventScope
 import com.example.wiresag.osmdroid.StubLocationProvider
 import com.example.wiresag.osmdroid.toGeoPoint
-import com.example.wiresag.state.GeoObjects
-import com.example.wiresag.state.PhotoWithGeoPoint
+import com.example.wiresag.state.ObjectContext
 import com.example.wiresag.state.WireSpanPhoto
-import com.example.wiresag.storage.image.ImageStorage
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
@@ -39,12 +36,11 @@ class WireSagViewModel(
     applicationContext: Context,
     private val locationProvider: IMyLocationProvider,
     private val photoRequest: PhotoRequest,
-    private val imageStorage: ImageStorage
+    private val objectContext: ObjectContext,
 ) {
     private var currentLocation by mutableStateOf(null as Location?)
     private val currentGeoPoint by derivedStateOf { currentLocation?.toGeoPoint() }
     private var prevLocation: Location? = null
-    private val geoObjects = GeoObjects()
     private var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
 
     init {
@@ -107,16 +103,16 @@ class WireSagViewModel(
     }
 
     private fun CanvasOverlay.DrawScope.mapCanvasDraw() {
-        geoObjects.pylons.forEachIndexed { i, pylon ->
+        objectContext.pylons.forEachIndexed { i, pylon ->
             val px = pylon.geoPoint.toPixelF()
             if (i > 0) {
-                val prevPx = geoObjects.pylons[i - 1].geoPoint.toPixelF()
+                val prevPx = objectContext.pylons[i - 1].geoPoint.toPixelF()
                 canvas.drawLine(px.x, px.y, prevPx.x, prevPx.y, Paints.pylon)
             }
             canvas.drawCircle(px.x, px.y, 10f, Paints.pylon)
         }
 
-        geoObjects.spans.forEach { span ->
+        objectContext.spans.forEach { span ->
             span.photoLine.normalPoints
                 .map { it.toPixelF() }
                 .let { (px1, px2) ->
@@ -142,7 +138,7 @@ class WireSagViewModel(
 
     private fun markPylon() {
         currentLocation?.run {
-            geoObjects.markPylon(toGeoPoint())
+            objectContext.markPylon(toGeoPoint())
         }
     }
 
@@ -152,18 +148,15 @@ class WireSagViewModel(
         currentLocation ?: return
         photoRequest.takePhoto { photo ->
             val photo = photo ?: return@takePhoto
-            val currentGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
-            val span = geoObjects.nearestWireSpan(currentGeoPoint, maxDistanceFromPhotoToSpan)
+            val photoGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
+            val span = objectContext.nearestWireSpan(photoGeoPoint, maxDistanceFromPhotoToSpan)
                 ?: return@takePhoto
-            val photoId = imageStorage.save(photo)
-            photoForAnnotation = span.photos.addItem(
-                WireSpanPhoto(span, PhotoWithGeoPoint(photoId, currentGeoPoint))
-            )
+            photoForAnnotation = objectContext.addWireSpanPhoto(span, photo, photoGeoPoint)
         }
     }
 
     private fun onSingleTapConfirmed(d: MapViewMotionEventScope): Boolean {
-        val tappedPhoto = geoObjects.nearestSpanPhoto(d.geoPoint, maxDistance = 3.0)
+        val tappedPhoto = objectContext.nearestSpanPhoto(d.geoPoint, maxDistance = 3.0)
         photoForAnnotation = tappedPhoto
         return tappedPhoto != null
     }
@@ -191,14 +184,13 @@ class WireSagViewModel(
                     .fillMaxSize()
                     .zIndex(1f),
                 spanPhoto = photoForAnnotation!!,
-                imageById = { imageStorage.read(it) },
+                imageById = { id -> objectContext.readImage(id) },
                 onClose = {
                     photoForAnnotation = null
                 },
                 onDelete = {
                     if (photoForAnnotation != null) {
-                        geoObjects.deleteSpanPhoto(photoForAnnotation!!)
-                        imageStorage.delete(photoForAnnotation!!.photoWithGeoPoint.photoId)
+                        objectContext.deleteSpanPhoto(photoForAnnotation!!)
                         photoForAnnotation = null
                     }
                 }
@@ -222,7 +214,7 @@ class WireSagViewModel(
 
                 TransparentButton(
                     onClick = { takePhotoWithLocation() },
-                    enabled = currentLocation != null && geoObjects.pylons.size > 1
+                    enabled = currentLocation != null && objectContext.pylons.size > 1
                 ) {
                     Icon(R.drawable.ic_baseline_add_a_photo_24)
                 }
@@ -265,8 +257,14 @@ class WireSagViewModel(
 
     @Composable
     fun View() {
+        SaveDependencyEval()
         WireSagAnnotation()
         Map()
+    }
+
+    @Composable
+    fun SaveDependencyEval() {
+        objectContext.saveRequest
     }
 }
 

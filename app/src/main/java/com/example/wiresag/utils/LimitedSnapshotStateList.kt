@@ -1,6 +1,7 @@
 package com.example.wiresag.utils
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import kotlin.math.min
 
 class LimitedSnapshotStateList<E>(
     val maxSize: Int,
@@ -16,13 +17,17 @@ class LimitedSnapshotStateList<E>(
     }
 
     override fun addAll(elements: Collection<E>) = if (size < maxSize) {
-        delegate.addAll(elements.toList().subList(0, maxSize - size))
+        val elements = if (elements is List<E>) elements else elements.toList()
+        val toIndex = min(maxSize - size, elements.size)
+        delegate.addAll(elements.subList(0, toIndex))
     } else {
         false
     }
 
     override fun addAll(index: Int, elements: Collection<E>) = if (size < maxSize) {
-        delegate.addAll(index, elements.toList().subList(0, maxSize - size))
+        val elements = if (elements is List<E>) elements else elements.toList()
+        val toIndex = min(maxSize - size, elements.size)
+        delegate.addAll(index, elements.subList(0, toIndex))
     } else {
         false
     }

@@ -39,7 +39,7 @@ import com.example.wiresag.utils.round
 fun WireSagAnnotationTool(
     modifier: Modifier,
     spanPhoto: WireSpanPhoto,
-    imageById: (String) -> Bitmap?,
+    imageById: (id: String) -> Bitmap?,
     onClose: () -> Unit,
     onDelete: (WireSpanPhoto) -> Unit
 ) {

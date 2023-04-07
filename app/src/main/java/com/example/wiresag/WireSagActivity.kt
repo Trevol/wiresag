@@ -10,6 +10,8 @@ import androidx.compose.runtime.remember
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
 import com.example.wiresag.osmdroid.StubLocationProvider
+import com.example.wiresag.state.ObjectContext
+import com.example.wiresag.storage.entities.JsonFileEntitiesStore
 import com.example.wiresag.storage.image.FileImageStorage
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
@@ -57,6 +59,9 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         val imagesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             ?: File(context.filesDir, "Pictures").also { it.mkdirs() }
 
+        val dataDirectory = context.getExternalFilesDir("data")
+            ?: File(context.filesDir, "data").also { it.mkdirs() }
+
         val photoRequest = CameraPhotoRequest(
             context,
             File(imagesDirectory, "photoRequestTmp").apply { mkdirs() },
@@ -83,13 +88,18 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         }
 
 
-        fun viewModel() = WireSagViewModel(
-            context,
-            locationProvider(),
-            photoRequest,
-            FileImageStorage(
+        fun viewModel(): WireSagViewModel {
+            val imageStorage = FileImageStorage(
                 storageDirectory = File(imagesDirectory, "spans").apply { mkdirs() }
             )
-        )
+            //val imageStorage = InMemoryImageStorage()
+            val entitiesStore = JsonFileEntitiesStore(dataDirectory)
+            return WireSagViewModel(
+                context,
+                locationProvider(),
+                photoRequest,
+                objectContext = ObjectContext(entitiesStore, imageStorage)
+            )
+        }
     }
 }
