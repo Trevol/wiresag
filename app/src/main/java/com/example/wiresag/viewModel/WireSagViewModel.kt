@@ -16,6 +16,7 @@ import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
+import com.example.wiresag.location.info
 import com.example.wiresag.mapView.*
 import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.mapView.overlays.MapViewMotionEvent
@@ -288,10 +289,4 @@ private fun LocationInfo(
             Text(location.info(), fontSize = 10.sp)
         }
     }
-}
-
-private fun Location.info(): String {
-    val speedInfo = if (hasSpeed()) speed.round(3) else ""
-    val latLon = "${DMS(latitude).prettyFormat()}, ${DMS(longitude).prettyFormat()}"
-    return "$provider: $latLon   ${accuracy.round(1)}   $speedInfo"
 }
