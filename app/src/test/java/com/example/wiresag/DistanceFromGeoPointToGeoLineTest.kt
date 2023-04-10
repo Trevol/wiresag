@@ -1,7 +1,9 @@
 package com.example.wiresag
 
 import com.example.wiresag.math.LineEquation
+import com.example.wiresag.math.ParametricLineEquation
 import com.example.wiresag.math.Point
+import com.example.wiresag.math.Vector
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 
@@ -48,5 +50,14 @@ class DistanceFromGeoPointToGeoLineTest {
                 l1.intersection(l2) shouldBe expected
                 l1.intersection(l2) shouldBe expected
             }*/
+    }
+
+    @Test
+    fun parametricLineEquationTest() {
+        ParametricLineEquation(Point(12.56, -4.67), k = .1234).k shouldBe .1234
+        ParametricLineEquation(
+            Point(1.0, 0.0),
+            Vector(0.0, 1.0)
+        ).k shouldBe Double.POSITIVE_INFINITY
     }
 }

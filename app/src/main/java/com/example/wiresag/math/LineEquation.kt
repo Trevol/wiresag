@@ -1,6 +1,6 @@
 package com.example.wiresag.math
 
-class LineEquation(val k: Double, val y0: Double) {
+class LineEquation(val k: Double, private val y0: Double) {
     constructor(k: Double, p: Point) : this(k = k, y0 = p.y - p.x * k)
     constructor(p1: Point, p2: Point) : this(k = k(p2, p1), p1)
     constructor(twoPoints: Pair<Point, Point>) : this(twoPoints.second, twoPoints.first)
@@ -11,14 +11,11 @@ class LineEquation(val k: Double, val y0: Double) {
         }
     }
 
-    inline operator fun invoke(x: Double): Double = y(x)
-    //inline operator fun invoke(x: Int): Double = y(x)
-
-    fun y(x: Double) = k * x + y0
-    //fun y(x: Int) = y(x.toDouble())
+    //operator fun invoke(x: Double): Double = y(x)
+    //private fun y(x: Double) = k * x + y0
 
     fun normalLine(p: Point): LineEquation {
-        // уравнение прямой, проходящей через т. p и перпендикулярной данной прамой,
+        // уравнение прямой, проходящей через точку p и перпендикулярной данной прямой,
         // tan(a+90) = -cot(a) = -1/tan(a)
         return LineEquation(k = -1 / k, p = p)
     }
@@ -42,6 +39,7 @@ class LineEquation(val k: Double, val y0: Double) {
     }
 
     companion object {
-        fun k(p1: Point, p2: Point) = (p2.y - p1.y) / (p2.x - p1.x)
+        private fun k(p1: Point, p2: Point) = (p2.y - p1.y) / (p2.x - p1.x)
     }
 }
+
