@@ -19,7 +19,7 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
 
     data class ExtendedResult(
         val locations: List<LocationsRadiansWithDistance>,
-        val segmentIn2D: Pair<Point, Point>,
+        val segmentIn2D: Pair<Point2d, Point2d>,
         val points: List<PointsWithDistance>
     )
 
@@ -41,7 +41,7 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
 
     companion object {
         private fun pointsIn2D(
-            segment: Pair<Point, Point>,
+            segment: Pair<Point2d, Point2d>,
             distances: Set<Double>
         ): List<PointsWithDistance> {
             val m = segment.first.midpoint(segment.second)
@@ -50,13 +50,13 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
             return distances.map { distance ->
                 val dx = distance * cos(abNormalAngle)
                 val dy = distance * sin(abNormalAngle)
-                PointsWithDistance(Point(m.x + dx, m.y + dy), Point(m.x - dx, m.y - dy), distance)
+                PointsWithDistance(Point2d(m.x + dx, m.y + dy), Point2d(m.x - dx, m.y - dy), distance)
             }
         }
 
         private data class SphericalToXYMapping(
             val origin: LocationRadians,
-            val segment: Pair<Point, Point>
+            val segment: Pair<Point2d, Point2d>
         )
 
         private fun to2D(segment: Pair<LocationRadians, LocationRadians>): SphericalToXYMapping {
@@ -67,14 +67,14 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
                 segment.first.centralAngle(segment.first.plus(0.0, deltaLon))
             return SphericalToXYMapping(
                 origin = segment.first,
-                segment = Point(0.0, 0.0) to Point(
+                segment = Point2d(0.0, 0.0) to Point2d(
                     sign(deltaLon) * centralAngleAlongXAxis,
                     deltaLat
                 ),
             )
         }
 
-        private fun Point.toSpherical(origin: LocationRadians): LocationRadians {
+        private fun Point2d.toSpherical(origin: LocationRadians): LocationRadians {
             //  y - центральный угол по меридиану
             //  x - центральный угол по параллели
             val lat = origin.latitude + y
@@ -139,8 +139,8 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
         }
 
         fun points(
-            points: Pair<Point, Point>,
-            segment: Pair<Point, Point>,
+            points: Pair<Point2d, Point2d>,
+            segment: Pair<Point2d, Point2d>,
             distance: Double,
             epsilon: Double = 5e-13
         ) {
@@ -191,8 +191,8 @@ data class GeoPointsWithDistance(
 )
 
 data class PointsWithDistance(
-    val point1: Point,
-    val point2: Point,
+    val point1: Point2d,
+    val point2: Point2d,
     val distance: Double
 )
 
