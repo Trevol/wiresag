@@ -1,5 +1,7 @@
 package com.example.wiresag.math
 
+/*
+
 class LineEquation(val k: Double, private val y0: Double) {
     constructor(k: Double, p: Point2d) : this(k = k, y0 = p.y - p.x * k)
     constructor(p1: Point2d, p2: Point2d) : this(k = k(p2, p1), p1)
@@ -11,8 +13,8 @@ class LineEquation(val k: Double, private val y0: Double) {
         }
     }
 
-    //operator fun invoke(x: Double): Double = y(x)
-    //private fun y(x: Double) = k * x + y0
+    operator fun invoke(x: Double): Double = y(x)
+    private fun y(x: Double) = k * x + y0
 
     fun normalLine(p: Point2d): LineEquation {
         // уравнение прямой, проходящей через точку p и перпендикулярной данной прямой,
@@ -42,4 +44,5 @@ class LineEquation(val k: Double, private val y0: Double) {
         private fun k(p1: Point2d, p2: Point2d) = (p2.y - p1.y) / (p2.x - p1.x)
     }
 }
+*/
 

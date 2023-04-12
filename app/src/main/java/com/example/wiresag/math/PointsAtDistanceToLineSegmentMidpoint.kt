@@ -45,7 +45,7 @@ class PointsAtDistanceToLineSegmentMidpoint(val angularDistancesToMidpoint: Set<
             distances: Set<Double>
         ): List<PointsWithDistance> {
             val m = segment.first.midpoint(segment.second)
-            val abNormalAngle = atan(LineEquation(segment).normalLine(m).k)
+            val abNormalAngle = atan(ParametricLineEquation(segment).normalLine(m).k)
 
             return distances.map { distance ->
                 val dx = distance * cos(abNormalAngle)

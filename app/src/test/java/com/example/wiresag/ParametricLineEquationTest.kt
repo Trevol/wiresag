@@ -45,7 +45,6 @@ class ParametricLineEquationTest {
             eq2.intersection(eq1) shouldBe expected
         }
 
-        //***************
         Pair(
             ParametricLineEquation(Point2d(0.0, 0.0), Vector2d(1.0, 1.0)),
             ParametricLineEquation(Point2d(2.0, 0.0), Vector2d(-1.0, 1.0))
@@ -91,15 +90,14 @@ class ParametricLineEquationTest {
             eq2.intersection(eq1) shouldBe expected
         }
 
-        /*Pair(
+        Pair(
             ParametricLineEquation(Point2d(2.0, -3.0), Vector2d(-4.0, 1.0)),
             ParametricLineEquation(Point2d(-1.0, 2.0), Vector2d(2.0, -1.0))
         ).let { (eq1, eq2) ->
-            val expected = Point2d(16.25, -6.75)
+            val expected = Point2d(16.0, -6.5)
             eq1.intersection(eq2) shouldBe expected
             eq2.intersection(eq1) shouldBe expected
-        }*/
-        //****************
+        }
 
         Pair(
             ParametricLineEquation(Point2d(1.0, 0.0), Vector2d(0.0, 1.5)),
@@ -118,5 +116,14 @@ class ParametricLineEquationTest {
             eq2.intersection(eq1) shouldBe null
             eq1.intersection(eq1) shouldBe null
         }
+    }
+
+    @Test
+    fun k() {
+        ParametricLineEquation(Point2d(12.56, -4.67), k = .1234).k shouldBe .1234
+        ParametricLineEquation(
+            Point2d(1.0, 0.0),
+            Vector2d(0.0, 1.0)
+        ).k shouldBe Double.POSITIVE_INFINITY
     }
 }
