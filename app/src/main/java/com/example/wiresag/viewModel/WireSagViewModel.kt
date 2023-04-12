@@ -16,8 +16,10 @@ import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
 import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
+import com.example.wiresag.location.Location
 import com.example.wiresag.location.info
-import com.example.wiresag.mapView.*
+import com.example.wiresag.mapView.WireSagMap
+import com.example.wiresag.mapView.WireSagMapView
 import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.mapView.overlays.MapViewMotionEvent
 import com.example.wiresag.mapView.overlays.MapViewMotionEventScope
@@ -30,9 +32,7 @@ import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.drawCircle
 import com.example.wiresag.ui.drawLine
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
-import com.example.wiresag.utils.*
 import org.osmdroid.config.Configuration
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 class WireSagViewModel(
@@ -43,9 +43,10 @@ class WireSagViewModel(
 ) {
     private var zoomLevel by mutableStateOf(15.0)
 
-    private var currentLocation by mutableStateOf(null as Location?)
-    private val currentGeoPoint by derivedStateOf { currentLocation?.toGeoPoint() }
-    private var prevLocation: Location? = null
+    private var providerLocation by mutableStateOf(null as Location?)
+    private var isInitialLocation = false
+    private var initialLocationAnimated = false
+    private val currentLocation by derivedStateOf { providerLocation?.toGeoPoint() }
 
     private var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
 
@@ -68,15 +69,16 @@ class WireSagViewModel(
     }
 
     private fun updateMyLocation(newLocation: Location?) {
-        prevLocation = currentLocation
-        currentLocation = newLocation
+        if (providerLocation == null && newLocation != null) {
+            isInitialLocation = true
+        }
+        providerLocation = newLocation
     }
 
     private fun updateMapView(map: WireSagMapView) {
-        val locationIsInitial = currentLocation != null && prevLocation == null
-        if (locationIsInitial) {
-            map.controller.animateTo(GeoPoint(currentLocation!!), 19.5, null)
-            prevLocation = currentLocation // animate only once!!!
+        if (isInitialLocation && !initialLocationAnimated) {
+            map.controller.animateTo(currentLocation!!, 19.5, null)
+            initialLocationAnimated = true
         }
     }
 
@@ -130,14 +132,14 @@ class WireSagViewModel(
             }
         }
 
-        currentGeoPoint?.run {
+        currentLocation?.run {
             canvas.drawCircle(toPixelF(), 10f, Paints.location)
         }
     }
 
     private fun markPylon() {
         currentLocation?.run {
-            objectContext.markPylon(toGeoPoint())
+            objectContext.markPylon(this)
         }
     }
 
@@ -147,10 +149,10 @@ class WireSagViewModel(
         currentLocation ?: return
         photoRequest.takePhoto { photo ->
             val photo = photo ?: return@takePhoto
-            val photoGeoPoint = currentLocation?.toGeoPoint() ?: return@takePhoto
-            val span = objectContext.nearestWireSpan(photoGeoPoint, maxDistanceFromPhotoToSpan)
+            val photoLocation = currentLocation ?: return@takePhoto
+            val span = objectContext.nearestWireSpan(photoLocation, maxDistanceFromPhotoToSpan)
                 ?: return@takePhoto
-            photoForAnnotation = objectContext.addWireSpanPhoto(span, photo, photoGeoPoint)
+            photoForAnnotation = objectContext.addWireSpanPhoto(span, photo, photoLocation)
         }
     }
 
@@ -162,14 +164,14 @@ class WireSagViewModel(
 
     private fun navigateToLocation(location: Location?) {
         if (location != null) {
-            //TODO: Navigate!!! How?
+            //TODO: Navigate!!! But how?
         }
     }
 
     private fun initLongPressHandler(): MapViewMotionEvent? =
         if (locationProvider is StubLocationProvider) {
             {
-                currentLocation = it.geoPoint.let { Location(it.latitude, it.longitude) }
+                providerLocation = it.geoPoint.run { Location(latitude, longitude) }
                 true
             }
         } else null
@@ -229,7 +231,7 @@ class WireSagViewModel(
             UpperButtons()
 
             LocationInfo(
-                currentLocation,
+                providerLocation,
                 onClick = ::navigateToLocation
             )
         }
@@ -243,7 +245,7 @@ class WireSagViewModel(
             WireSagMap(
                 modifier = Modifier.fillMaxSize(),
                 onInitMapView = {
-                    it.controller.setZoom(15.0)
+                    it.controller.setZoom(zoomLevel)
                 },
                 onUpdateMapView = ::updateMapView,
                 onSingleTapConfirmed = ::onSingleTapConfirmed,
