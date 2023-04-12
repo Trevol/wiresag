@@ -248,7 +248,7 @@ class WireSagViewModel(
                 onUpdateMapView = ::updateMapView,
                 onSingleTapConfirmed = ::onSingleTapConfirmed,
                 onLongPress = initLongPressHandler(),
-                onZoom = { level -> zoomLevel = level },
+                onZoom = { zoomLevel = it },
                 onCanvasDraw = { mapCanvasDraw() }
             )
 
