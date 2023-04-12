@@ -27,6 +27,8 @@ import com.example.wiresag.state.ObjectContext
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
+import com.example.wiresag.ui.drawCircle
+import com.example.wiresag.ui.drawLine
 import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import com.example.wiresag.utils.*
 import org.osmdroid.config.Configuration
@@ -39,9 +41,12 @@ class WireSagViewModel(
     private val photoRequest: PhotoRequest,
     private val objectContext: ObjectContext,
 ) {
+    private var zoomLevel by mutableStateOf(15.0)
+
     private var currentLocation by mutableStateOf(null as Location?)
     private val currentGeoPoint by derivedStateOf { currentLocation?.toGeoPoint() }
     private var prevLocation: Location? = null
+
     private var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
 
     init {
@@ -104,36 +109,29 @@ class WireSagViewModel(
     }
 
     private fun CanvasOverlay.DrawScope.mapCanvasDraw() {
-        objectContext.pylons.forEachIndexed { i, pylon ->
-            val px = pylon.geoPoint.toPixelF()
-            if (i > 0) {
-                val prevPx = objectContext.pylons[i - 1].geoPoint.toPixelF()
-                canvas.drawLine(px.x, px.y, prevPx.x, prevPx.y, Paints.pylon)
-            }
-            canvas.drawCircle(px.x, px.y, 10f, Paints.pylon)
+        objectContext.pylons.forEach { pylon ->
+            canvas.drawCircle(pylon.geoPoint.toPixelF(), 10f, Paints.pylon)
         }
 
         objectContext.spans.forEach { span ->
-            span.photoLine.normalPoints
-                .map { it.toPixelF() }
-                .let { (px1, px2) ->
-                    canvas.drawLine(px1.x, px1.y, px2.x, px2.y, Paints.normal)
-                }
-            span.photoLine.allPoints
-                .map { it.toPixelF() }
-                .forEach { px ->
-                    canvas.drawCircle(px.x, px.y, 5f, Paints.placeForPhoto)
-                }
-            span.photos
-                .map { it.photoWithGeoPoint.geoPoint.toPixelF() }
-                .forEach { px ->
-                    canvas.drawCircle(px.x, px.y, 10f, Paints.photo)
-                }
+            canvas.drawLine(
+                span.pylon1.geoPoint.toPixelF(),
+                span.pylon2.geoPoint.toPixelF(),
+                Paints.pylon
+            )
+            span.photoLine.normalPoints.let { (gp1, gp2) ->
+                canvas.drawLine(gp1.toPixelF(), gp2.toPixelF(), Paints.normal)
+            }
+            span.photoLine.allPoints.forEach {
+                canvas.drawCircle(it.toPixelF(), 5f, Paints.placeForPhoto)
+            }
+            span.photos.forEach {
+                canvas.drawCircle(it.photoWithGeoPoint.geoPoint.toPixelF(), 10f, Paints.photo)
+            }
         }
 
         currentGeoPoint?.run {
-            val px = toPixelF()
-            canvas.drawCircle(px.x, px.y, 10f, Paints.location)
+            canvas.drawCircle(toPixelF(), 10f, Paints.location)
         }
     }
 
@@ -250,6 +248,7 @@ class WireSagViewModel(
                 onUpdateMapView = ::updateMapView,
                 onSingleTapConfirmed = ::onSingleTapConfirmed,
                 onLongPress = initLongPressHandler(),
+                onZoom = { level -> zoomLevel = level },
                 onCanvasDraw = { mapCanvasDraw() }
             )
 

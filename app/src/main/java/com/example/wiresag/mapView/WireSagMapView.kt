@@ -9,6 +9,9 @@ import com.example.wiresag.osmdroid.compose.MapView
 import com.example.wiresag.osmdroid.enableRotationGesture
 import com.example.wiresag.osmdroid.enableScaleBar
 import com.example.wiresag.utils.addTo
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.views.MapView
 
 class WireSagMapView(
@@ -36,7 +39,8 @@ fun WireSagMap(
     onInitMapView: (map: WireSagMapView) -> Unit = {},
     onUpdateMapView: (map: WireSagMapView) -> Unit = {},
     onSingleTapConfirmed: MapViewMotionEvent? = null,
-    onLongPress: MapViewMotionEvent?,
+    onLongPress: MapViewMotionEvent? = null,
+    onZoom: ((zoomLevel: Double) -> Unit)? = null,
     onCanvasDraw: CanvasOverlay.DrawScope.() -> Unit = {}
 ) {
     MapView(
@@ -47,7 +51,7 @@ fun WireSagMap(
                 onSingleTapConfirmed = onSingleTapConfirmed,
                 onLongPress = onLongPress,
                 onCanvasDraw = onCanvasDraw
-            )
+            ).addMapListener(onZoom)
         },
         onInitMapView = onInitMapView,
         onUpdateMapView = {
@@ -56,4 +60,21 @@ fun WireSagMap(
             it.postInvalidate()
         }
     )
+}
+
+private fun <MV : MapView> MV.addMapListener(
+    onZoom: ((zoomLevel: Double) -> Unit)? = null
+) = apply {
+    if (onZoom != null) {
+        addMapListener(
+            object : MapListener {
+                override fun onScroll(event: ScrollEvent?) = false
+                override fun onZoom(event: ZoomEvent): Boolean {
+                    onZoom(event.zoomLevel)
+                    return true
+                }
+
+            }
+        )
+    }
 }
