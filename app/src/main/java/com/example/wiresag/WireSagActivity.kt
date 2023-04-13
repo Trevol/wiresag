@@ -16,6 +16,7 @@ import com.example.wiresag.storage.image.FileImageStorage
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
+import com.example.wiresag.viewModel.View
 import com.example.wiresag.viewModel.WireSagViewModel
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
@@ -45,8 +46,11 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         permissionsRequest().launch { granted ->
             setContent {
                 if (granted) {
-                    val viewModel = remember { services.viewModel() }
-                    Main { viewModel.View() }
+                    Main {
+                        with(remember { services.viewModel() }) {
+                            View()
+                        }
+                    }
                 } else {
                     NoPermissions()
                 }
