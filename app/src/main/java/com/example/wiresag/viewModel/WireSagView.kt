@@ -18,6 +18,7 @@ import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.state.Pylon
 import com.example.wiresag.state.WireSpan
+import com.example.wiresag.state.WireSpanGeoMeasurements
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.drawCircle
@@ -107,8 +108,14 @@ private fun WireSagViewModel.Map() {
             onLongPress = initLongPressHandler(),
             onZoom = { zoomLevel = it }
         ) {
-            with(Drawer) {
-                drawObjects(zoomLevel, currentLocation, objectContext.pylons, objectContext.spans)
+            with(ObjectsDrawer) {
+                draw(
+                    zoomLevel,
+                    currentLocation,
+                    objectContext.pylons,
+                    objectContext.spans,
+                    nearestSpanMeasurements
+                )
             }
         }
 
@@ -143,7 +150,7 @@ private fun LocationInfo(
 }
 
 
-private object Drawer {
+private object ObjectsDrawer {
     private object Paints {
         val location = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
@@ -154,6 +161,16 @@ private object Drawer {
             style = android.graphics.Paint.Style.FILL
             strokeWidth = 0f
             color = Color.argb(127, 0, 0, 255)
+        }
+        val span = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL_AND_STROKE
+            strokeWidth = 1f
+            color = Color.argb(127, 0, 0, 255)
+        }
+        val nearestSpan = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL_AND_STROKE
+            strokeWidth = 2.5f
+            color = Color.argb(255, 0, 0, 255)
         }
         val placeForPhoto = NativePaint().apply {
             style = android.graphics.Paint.Style.FILL
@@ -166,17 +183,18 @@ private object Drawer {
             color = Color.argb(255, 200, 0, 0)
         }
         val normal = NativePaint().apply {
-            style = android.graphics.Paint.Style.FILL
-            strokeWidth = 0f
+            style = android.graphics.Paint.Style.FILL_AND_STROKE
+            strokeWidth = 1f
             color = Color.BLACK
         }
     }
 
-    fun CanvasOverlay.DrawScope.drawObjects(
+    fun CanvasOverlay.DrawScope.draw(
         zoomLevel: Double,
         currentLocation: GeoPoint?,
         pylons: List<Pylon>,
-        wireSpans: List<WireSpan>
+        wireSpans: List<WireSpan>,
+        nearestSpanMeasurements: WireSpanGeoMeasurements?
     ) {
         pylons.forEach { pylon ->
             canvas.drawCircle(pylon.geoPoint.toPixelF(), 10f, Paints.pylon)
@@ -186,16 +204,25 @@ private object Drawer {
             canvas.drawLine(
                 span.pylon1.geoPoint.toPixelF(),
                 span.pylon2.geoPoint.toPixelF(),
-                Paints.pylon
+                Paints.span
             )
-            span.photoLine.normalPoints.let { (gp1, gp2) ->
-                canvas.drawLine(gp1.toPixelF(), gp2.toPixelF(), Paints.normal)
-            }
-            span.photoLine.allPoints.forEach {
-                canvas.drawCircle(it.toPixelF(), 5f, Paints.placeForPhoto)
-            }
             span.photos.forEach {
                 canvas.drawCircle(it.photoWithGeoPoint.geoPoint.toPixelF(), 10f, Paints.photo)
+            }
+        }
+
+        nearestSpanMeasurements?.run {
+            canvas.drawLine(
+                span.pylon1.geoPoint.toPixelF(),
+                span.pylon2.geoPoint.toPixelF(),
+                Paints.nearestSpan
+            )
+
+            photoLine.normalPoints.let { (gp1, gp2) ->
+                canvas.drawLine(gp1.toPixelF(), gp2.toPixelF(), Paints.normal)
+            }
+            photoLine.allPoints.forEach {
+                canvas.drawCircle(it.toPixelF(), 5f, Paints.placeForPhoto)
             }
         }
 

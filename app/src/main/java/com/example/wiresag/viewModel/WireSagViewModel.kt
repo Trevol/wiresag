@@ -1,37 +1,19 @@
 package com.example.wiresag.viewModel
 
 import android.content.Context
-import android.graphics.Color
 import android.location.Location
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.NativePaint
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.preference.PreferenceManager
-import com.example.wiresag.R
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.location.Location
-import com.example.wiresag.location.info
-import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.WireSagMapView
-import com.example.wiresag.mapView.overlays.CanvasOverlay
 import com.example.wiresag.mapView.overlays.MapViewMotionEvent
 import com.example.wiresag.mapView.overlays.MapViewMotionEventScope
 import com.example.wiresag.osmdroid.StubLocationProvider
 import com.example.wiresag.osmdroid.toGeoPoint
 import com.example.wiresag.state.ObjectContext
+import com.example.wiresag.state.WireSpanGeoMeasurements
 import com.example.wiresag.state.WireSpanPhoto
-import com.example.wiresag.ui.components.Icon
-import com.example.wiresag.ui.components.TransparentButton
-import com.example.wiresag.ui.drawCircle
-import com.example.wiresag.ui.drawLine
-import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
@@ -47,6 +29,16 @@ class WireSagViewModel(
     private var isInitialLocation = false
     private var initialLocationAnimated = false
     val currentLocation by derivedStateOf { providerLocation?.toGeoPoint() }
+
+    val nearestSpanMeasurements by derivedStateOf {
+        val currentLocation = currentLocation
+        if (currentLocation == null || zoomLevel < 18) {
+            return@derivedStateOf null
+        }
+        val span = objectContext.nearestWireSpan(currentLocation, maxDistanceFromPhotoToSpan)
+            ?: return@derivedStateOf null
+        return@derivedStateOf WireSpanGeoMeasurements(span)
+    }
 
     var photoForAnnotation by mutableStateOf(null as WireSpanPhoto?)
 
@@ -88,7 +80,7 @@ class WireSagViewModel(
         }
     }
 
-    private val maxDistanceFromPhotoToSpan = 200.0
+    private val maxDistanceFromPhotoToSpan = 100.0
 
     fun takePhotoWithLocation() {
         currentLocation ?: return
