@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Text
 import androidx.compose.runtime.remember
+import androidx.preference.PreferenceManager
 import com.example.wiresag.activity.FullScreenActivity
 import com.example.wiresag.camera.CameraPhotoRequest
 import com.example.wiresag.osmdroid.StubLocationProvider
@@ -18,6 +19,7 @@ import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.View
 import com.example.wiresag.viewModel.WireSagViewModel
+import org.osmdroid.config.Configuration
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
@@ -38,6 +40,12 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Map not working without this line of code
+        Configuration.getInstance().load(
+            applicationContext,
+            PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        )
 
         services = Services(this)
 
@@ -99,7 +107,6 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
             //val imageStorage = InMemoryImageStorage()
             val entitiesStore = JsonFileEntitiesStore(dataDirectory)
             return WireSagViewModel(
-                context,
                 locationProvider(),
                 photoRequest,
                 objectContext = ObjectContext(entitiesStore, imageStorage)

@@ -1,8 +1,9 @@
 package com.example.wiresag.state
 
 import com.example.wiresag.math.invoke
+import org.osmdroid.util.GeoPoint
 
-class WireSpanGeoMeasurements(val span: WireSpan) {
+class WireSpanGeoMeasurements(val span: WireSpan, location: GeoPoint) {
 
     val photoLine = PhotoLine(span)
 
