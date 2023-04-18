@@ -17,6 +17,8 @@ data class WireSpanPhoto(
     val photoWithGeoPoint: PhotoWithGeoPoint
 ) : GeoPointAware by photoWithGeoPoint {
 
+    val wirePoints = LimitedSnapshotStateList<Offset>(maxSize = 3)
+
     val annotation = Annotation(this)
 
     val estimatedWireSag by derivedStateOf {
@@ -53,4 +55,8 @@ data class WireSpanPhoto(
             }
         }
     }
+}
+
+class WireSpanPhotoEstimations(val photo: WireSpanPhoto) {
+
 }
