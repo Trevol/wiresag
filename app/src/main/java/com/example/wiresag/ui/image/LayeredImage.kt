@@ -31,7 +31,7 @@ fun LayeredImage(
     }
 }
 
-fun TransformParameters.applyGesture(gesture: PanZoomGesture) =
+private fun TransformParameters.applyGesture(gesture: PanZoomGesture) =
     if (gesture.isReleaseEvent) {
         this
     } else {

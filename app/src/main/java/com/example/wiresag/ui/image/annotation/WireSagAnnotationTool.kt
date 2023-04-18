@@ -44,10 +44,7 @@ fun WireSagAnnotationTool(
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     val photo = imageById(spanPhoto.photoWithGeoPoint.photoId)
-
-    /*LaunchedEffect(Unit) {
-        TODO("Get image by spanPhoto.photoWithGeoPoint.photoId")
-    }*/
+    
     BackHandler(onBack = { onClose() })
     Box(
         modifier = modifier

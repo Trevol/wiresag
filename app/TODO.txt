@@ -1,3 +1,6 @@
+https://math.stackexchange.com/questions/4581103/finding-the-catenary-curve-through-three-given-points
+
+
 - ближайший пролет
      - нормаль показывать только для ближайшего пролета
 
