@@ -15,11 +15,8 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.NativePaint
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.wiresag.math.toDegrees
@@ -116,7 +113,7 @@ fun Annotation(
             }
         }
     ) {
-        drawAnnotation(spanPhoto.wireAnnotation.points, estimations, transform.scale)
+        draw(spanPhoto.wireAnnotation.points, estimations, transform.scale)
     }
 }
 
@@ -146,9 +143,13 @@ private fun SagInfo(estimations: WireSpanPhotoEstimations?) {
     }
 }
 
-private fun DrawScope.drawAnnotation(wireAnnotationPoints: List<Offset>, estimations: WireSpanPhotoEstimations?, scale: Float) {
+private fun DrawScope.draw(
+    wireAnnotationPoints: List<Offset>,
+    estimations: WireSpanPhotoEstimations?,
+    scale: Float
+) {
     if (estimations != null) {
-        drawAnnotatedTriangle(estimations.triangle, scale)
+        drawEstimations(estimations, scale)
     } else {
         drawPoints(wireAnnotationPoints, Color.Blue, scale)
     }
@@ -165,20 +166,27 @@ private fun DrawScope.drawText(text: String, textStart: Offset, paint: NativePai
 
 private fun radius(scale: Float) = 5f / scale
 
-private fun DrawScope.drawAnnotatedTriangle(triangle: SagTriangle, scale: Float) {
+private fun DrawScope.drawEstimations(estimations: WireSpanPhotoEstimations, scale: Float) {
+    drawPoints(
+        estimations.wireCurvePoints,
+        pointMode = PointMode.Polygon,
+        color = Color.Red,
+        strokeWidth = 1 / scale
+    )
+    drawPoints(estimations.photo.wireAnnotation.points, Color.Blue, scale)
     val radius = radius(scale)
-    drawCircle(Color.Green, radius, triangle.a)
-    drawCircle(Color.Green, radius, triangle.b)
-    drawCircle(Color.Green, radius, triangle.c)
+    drawCircle(Color.Green, radius, estimations.triangle.a)
+    drawCircle(Color.Green, radius, estimations.triangle.b)
+    drawCircle(Color.Green, radius, estimations.triangle.c)
 
-    drawLine(Color.Green, triangle.a, triangle.b)
-    drawLine(Color.Green, triangle.a, triangle.c)
-    drawLine(Color.Green, triangle.b, triangle.c)
+    drawLine(Color.Green, estimations.triangle.a, estimations.triangle.b)
+    drawLine(Color.Green, estimations.triangle.a, estimations.triangle.c)
+    drawLine(Color.Green, estimations.triangle.b, estimations.triangle.c)
 
     val labelPaint = vertexLabelPaint(scale)
-    drawText("A", triangle.a + Offset(0f, -15f) / scale, labelPaint)
-    drawText("B", triangle.b + Offset(0f, -15f) / scale, labelPaint)
-    drawText("C", triangle.c + Offset(0f, 24 + 5f) / scale, labelPaint)
+    drawText("A", estimations.triangle.a + Offset(0f, -15f) / scale, labelPaint)
+    drawText("B", estimations.triangle.b + Offset(0f, -15f) / scale, labelPaint)
+    drawText("C", estimations.triangle.c + Offset(0f, 24 + 5f) / scale, labelPaint)
 }
 
 private fun DrawScope.drawPoints(points: List<Offset>, color: Color, scale: Float) {

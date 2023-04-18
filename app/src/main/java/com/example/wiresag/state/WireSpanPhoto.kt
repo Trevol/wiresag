@@ -37,13 +37,3 @@ data class WireSpanPhoto(
     }
 }
 
-class WireSpanPhotoEstimations(val photo: WireSpanPhoto) {
-    init {
-        if (!photo.wireAnnotation.points.isFull()) {
-            throw Exception("Unexpected: !photo.wirePoints.isFull()")
-        }
-    }
-
-    val triangle = SagTriangle(photo.wireAnnotation.points)
-    val estimatedWireSag = triangle.estimatedWireSag(photo.span.length)
-}

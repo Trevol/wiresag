@@ -17,3 +17,6 @@ fun Parabola(p1: Offset, p2: Offset, p3: Offset): Parabola {
 
     return Parabola(a, b, c)
 }
+
+fun Parabola(points: List<Offset>) =
+    Parabola(points.component1(), points.component2(), points.component3())
