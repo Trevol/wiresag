@@ -28,12 +28,11 @@ class ObjectContext(
     private var nextSaveRequestEval = false
     val saveRequest by derivedStateOf {
         pylons.size
-        spans.forEach { it.photos.forEach { it.annotation.points.size } }
+        spans.forEach { it.photos.forEach { it.wireAnnotation.points.size } }
         if (nextSaveRequestEval) {
             entitiesStore.save(pylons.toTypedArray(), spans.toTypedArray())
         }
         nextSaveRequestEval = true
-        Unit
     }
 
     fun markPylon(geoPoint: GeoPoint) {

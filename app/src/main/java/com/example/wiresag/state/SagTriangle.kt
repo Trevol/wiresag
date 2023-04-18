@@ -27,6 +27,8 @@ data class SagTriangle(val a: Offset, val b: Offset, val c: Offset) {
     val angA = acos((abSquared + acSquared - bcSquared) / (2 * ab * ac))
 
     val sagPx = bc * sin(angB)
+
+    fun estimatedWireSag(abRealLength: Float) = sagPx * abRealLength / ab
 }
 
 fun SagTriangle(unclassifiedVertices: List<Offset>): SagTriangle {

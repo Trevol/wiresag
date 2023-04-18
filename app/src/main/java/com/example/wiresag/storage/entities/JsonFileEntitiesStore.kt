@@ -56,7 +56,7 @@ class JsonFileEntitiesStore(val directory: File, fileName: String = "entities.js
                 span,
                 photoWithGeoPoint = PhotoWithGeoPoint(it.photoId, it.geoPoint.toGeoPoint())
             ).apply {
-                annotation.points.addAll(it.annotationPoints.map { it.toOffset() })
+                wireAnnotation.points.addAll(it.annotationPoints.map { it.toOffset() })
             }
             span.photos.add(spanPhoto)
         }
@@ -80,7 +80,7 @@ class JsonFileEntitiesStore(val directory: File, fileName: String = "entities.js
                 spans.indexOf(photo.span),
                 photo.photoWithGeoPoint.photoId,
                 GeoPointRecord(photo.photoWithGeoPoint),
-                photo.annotation.points.map { it.toOffsetRecord() }
+                photo.wireAnnotation.points.map { it.toOffsetRecord() }
             )
         }
 

@@ -1,11 +1,9 @@
 package com.example.wiresag.ui.image.annotation
 
 import android.graphics.Bitmap
-import android.provider.Contacts.Intents.UI
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
@@ -27,11 +25,13 @@ import androidx.compose.ui.zIndex
 import com.example.wiresag.math.toDegrees
 import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
+import com.example.wiresag.state.WireSpanPhotoEstimations
 import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.ui.input.TransformParameters
 import com.example.wiresag.ui.stopClickPropagation
+import com.example.wiresag.utils.rememberDerivedStateOf
 import com.example.wiresag.utils.rememberMutableStateOf
 import com.example.wiresag.utils.round
 
@@ -44,7 +44,7 @@ fun WireSagAnnotationTool(
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     val photo = imageById(spanPhoto.photoWithGeoPoint.photoId)
-    
+
     BackHandler(onBack = { onClose() })
     Box(
         modifier = modifier
@@ -69,6 +69,8 @@ fun Annotation(
     onDelete: (WireSpanPhoto) -> Unit
 ) {
     var transform by rememberMutableStateOf(TransformParameters())
+    val estimations by rememberDerivedStateOf { spanPhoto.wireAnnotation.estimations() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -88,7 +90,7 @@ fun Annotation(
                 modifier = Modifier
                     .padding(ButtonDefaults.ContentPadding)
                     .background(Color(127, 127, 127, 100))
-                    .clickable { spanPhoto.annotation.points.clear() }
+                    .clickable { spanPhoto.wireAnnotation.points.clear() }
             )
 
             Icon(Icons.Outlined.Delete,
@@ -99,7 +101,7 @@ fun Annotation(
             )
         }
         Spacer(Modifier.weight(1f))
-        SagInfo(spanPhoto)
+        SagInfo(estimations)
     }
 
     LayeredImage(
@@ -110,11 +112,11 @@ fun Annotation(
         onClick = {
             val pointOnImage = it.layerPosition
             if (photo.rect.contains(pointOnImage)) {
-                spanPhoto.annotation.tryAddOrReplace(pointOnImage)
+                spanPhoto.wireAnnotation.tryAddOrUpdatePoint(pointOnImage)
             }
         }
     ) {
-        drawAnnotation(spanPhoto, transform.scale)
+        drawAnnotation(spanPhoto.wireAnnotation.points, estimations, transform.scale)
     }
 }
 
@@ -130,26 +132,25 @@ private fun ImageNotFound(imageId: String, onClose: () -> Unit) = Row {
 }
 
 @Composable
-private fun SagInfo(photo: WireSpanPhoto) {
-    val triangle = photo.annotation.triangle
-    if (triangle != null) {
+private fun SagInfo(estimations: WireSpanPhotoEstimations?) {
+    if (estimations != null) {
         Row(
             modifier = Modifier.background(Color.Gray),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("AB: ${photo.span.length.round(2)}m")
-            Text("∠A: ${triangle.angA.toDegrees().round(1)}°")
-            Text("∠B: ${triangle.angB.toDegrees().round(1)}°")
-            Text("Sag: ${photo.estimatedWireSag?.round(2)}m")
+            Text("AB: ${estimations.photo.span.length.round(2)}m")
+            Text("∠A: ${estimations.triangle.angA.toDegrees().round(1)}°")
+            Text("∠B: ${estimations.triangle.angB.toDegrees().round(1)}°")
+            Text("Sag: ${estimations.estimatedWireSag.round(2)}m")
         }
     }
 }
 
-private fun DrawScope.drawAnnotation(spanPhoto: WireSpanPhoto, scale: Float) {
-    if (spanPhoto.annotation.triangle != null) {
-        drawAnnotatedTriangle(spanPhoto.annotation.triangle!!, scale)
+private fun DrawScope.drawAnnotation(wireAnnotationPoints: List<Offset>, estimations: WireSpanPhotoEstimations?, scale: Float) {
+    if (estimations != null) {
+        drawAnnotatedTriangle(estimations.triangle, scale)
     } else {
-        drawPoints(spanPhoto.annotation.points, Color.Blue, scale)
+        drawPoints(wireAnnotationPoints, Color.Blue, scale)
     }
 }
 
