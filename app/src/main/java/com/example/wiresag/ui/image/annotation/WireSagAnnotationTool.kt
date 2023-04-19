@@ -171,13 +171,12 @@ private fun DrawScope.drawEstimations(estimations: WireSpanPhotoEstimations, sca
         estimations.wireCurvePoints,
         pointMode = PointMode.Polygon,
         color = Color.Red,
-        strokeWidth = 1 / scale
+        strokeWidth = 1f / scale
     )
-    drawPoints(estimations.photo.wireAnnotation.points, Color.Blue, scale)
     val radius = radius(scale)
-    drawCircle(Color.Green, radius, estimations.triangle.a)
-    drawCircle(Color.Green, radius, estimations.triangle.b)
-    drawCircle(Color.Green, radius, estimations.triangle.c)
+    drawCircle(Color.Red, radius, estimations.wireCurve.vertex)
+
+    drawPoints(estimations.photo.wireAnnotation.points, Color.Blue, scale)
 
     drawLine(Color.Green, estimations.triangle.a, estimations.triangle.b)
     drawLine(Color.Green, estimations.triangle.a, estimations.triangle.c)
@@ -193,8 +192,5 @@ private fun DrawScope.drawPoints(points: List<Offset>, color: Color, scale: Floa
     val radius = radius(scale)
     points.forEachIndexed { i, it ->
         drawCircle(color, radius, it)
-        if (i > 0) {
-            drawLine(color, it, points[i - 1])
-        }
     }
 }
