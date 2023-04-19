@@ -43,17 +43,12 @@ fun WireSagAnnotationTool(
     val photo = imageById(spanPhoto.photoWithGeoPoint.photoId)
 
     BackHandler(onBack = { onClose() })
-    Box(
-        modifier = modifier
-            .background(Color.White)
-            .stopClickPropagation()
-    ) {
+    Box(modifier.fillMaxSize()) {
         if (photo != null) {
             Annotation(spanPhoto, photo, onClose, onDelete)
         } else {
             ImageNotFound(spanPhoto.photoWithGeoPoint.photoId, onClose)
         }
-
     }
 
 }

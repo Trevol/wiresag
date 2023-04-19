@@ -23,12 +23,7 @@ import com.example.wiresag.viewModel.WireSagViewModel
 fun WireSagViewModel.Settings() {
     if (settingsMode) {
         BackHandler(onBack = { settingsMode = false })
-        Box(
-            modifier = Modifier
-                .background(Color.White)
-                .fillMaxSize()
-                .zIndex(1f)
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Row {
                 Icon(
                     Icons.Outlined.Done,

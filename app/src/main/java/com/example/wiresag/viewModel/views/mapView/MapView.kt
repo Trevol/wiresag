@@ -27,7 +27,7 @@ import com.example.wiresag.viewModel.WireSagViewModel
 import org.osmdroid.util.GeoPoint
 
 @Composable
-fun WireSagViewModel.Map() {
+fun WireSagViewModel.MapView() {
     Box(modifier = Modifier.fillMaxSize()) {
         MapControls()
         WireSagMap(

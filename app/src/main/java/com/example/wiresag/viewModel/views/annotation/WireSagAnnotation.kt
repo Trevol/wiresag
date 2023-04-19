@@ -10,9 +10,7 @@ import com.example.wiresag.viewModel.WireSagViewModel
 fun WireSagViewModel.WireSagAnnotation() {
     if (photoForAnnotation != null) {
         WireSagAnnotationTool(
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(1f),
+            modifier = Modifier.fillMaxSize(),
             spanPhoto = photoForAnnotation!!,
             imageById = { id -> objectContext.readImage(id) },
             onClose = {
