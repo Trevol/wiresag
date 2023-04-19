@@ -68,15 +68,23 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
     }
 
     private class Services(val context: ComponentActivity) {
-        val imagesDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            ?: File(context.filesDir, "Pictures").also { it.mkdirs() }
+        val settings = (context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            ?: File(context.filesDir, "Pictures").also { it.mkdirs() })
+            .let { imagesDirectory ->
+                AppSettings(
+                    dataDirectory = context.getExternalFilesDir("data")
+                        ?: File(context.filesDir, "data").also { it.mkdirs() },
+                    imagesDirectory = imagesDirectory,
+                    photoRequestTmpDirectory = File(imagesDirectory,"photoRequestTmp")
+                        .apply { mkdirs() },
+                    spanImagesDirectory = File(imagesDirectory, "spans").apply { mkdirs() }
+                )
+            }
 
-        val dataDirectory = context.getExternalFilesDir("data")
-            ?: File(context.filesDir, "data").also { it.mkdirs() }
 
         val photoRequest = CameraPhotoRequest(
             context,
-            File(imagesDirectory, "photoRequestTmp").apply { mkdirs() },
+            settings.photoRequestTmpDirectory,
             "wiresag_authority"
         )
 
@@ -101,12 +109,11 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
 
 
         fun viewModel(): WireSagViewModel {
-            val imageStorage = FileImageStorage(
-                storageDirectory = File(imagesDirectory, "spans").apply { mkdirs() }
-            )
+            val imageStorage = FileImageStorage(settings.spanImagesDirectory)
             //val imageStorage = InMemoryImageStorage()
-            val entitiesStore = JsonFileEntitiesStore(dataDirectory)
+            val entitiesStore = JsonFileEntitiesStore(settings.dataDirectory)
             return WireSagViewModel(
+                settings,
                 locationProvider(),
                 photoRequest,
                 objectContext = ObjectContext(entitiesStore, imageStorage)
@@ -114,3 +121,4 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         }
     }
 }
+

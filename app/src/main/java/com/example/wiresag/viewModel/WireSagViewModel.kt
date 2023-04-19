@@ -1,8 +1,8 @@
 package com.example.wiresag.viewModel
 
 import android.location.Location
-import android.util.Log
 import androidx.compose.runtime.*
+import com.example.wiresag.AppSettings
 import com.example.wiresag.camera.PhotoRequest
 import com.example.wiresag.location.Location
 import com.example.wiresag.mapView.WireSagMapView
@@ -16,6 +16,7 @@ import com.example.wiresag.state.WireSpanPhoto
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 
 class WireSagViewModel(
+    val settings: AppSettings,
     private val locationProvider: IMyLocationProvider,
     private val photoRequest: PhotoRequest,
     val objectContext: ObjectContext,
@@ -52,6 +53,13 @@ class WireSagViewModel(
 
     fun disableMyLocation() {
         locationProvider.stopLocationProvider()
+    }
+
+    fun clearData() {
+        objectContext.spans.clear()
+        objectContext.pylons.clear()
+        settings.spanImagesDirectory.listFiles()
+            ?.forEach { it.delete() }
     }
 
     private fun updateMyLocation(newLocation: Location?) {
