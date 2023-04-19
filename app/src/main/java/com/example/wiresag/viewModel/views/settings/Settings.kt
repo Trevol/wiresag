@@ -58,7 +58,7 @@ fun WireSagViewModel.Settings() {
                 }
             }
 
-            Button(onClick = { clearData() }) {
+            Button(onClick = { clearData() }, enabled = objectContext.pylons.isNotEmpty() || objectContext.spans.isNotEmpty()) {
                 Text("Стереть все данные")
             }
         }

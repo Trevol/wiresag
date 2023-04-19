@@ -16,6 +16,8 @@ import com.example.wiresag.R
 import com.example.wiresag.location.info
 import com.example.wiresag.mapView.WireSagMap
 import com.example.wiresag.mapView.overlays.CanvasOverlay
+import com.example.wiresag.math.round
+import com.example.wiresag.state.DistanceBetweenGeoPoints
 import com.example.wiresag.state.Pylon
 import com.example.wiresag.state.WireSpan
 import com.example.wiresag.state.WireSpanGeoMeasurements
@@ -66,12 +68,21 @@ private fun WireSagViewModel.MapControls() {
             ) {
                 Icon(R.drawable.ic_outline_settings_24)
             }
+
             Spacer(modifier = Modifier.weight(1f))
+
             TransparentButton(
-                onClick = { markPylon() },
+                onClick = { markStandalonePylon() },
                 enabled = currentLocation != null
             ) {
                 Icon(R.drawable.ic_outline_add_location_alt_24)
+            }
+
+            TransparentButton(
+                onClick = { markPylonWithSpan() },
+                enabled = currentLocation != null
+            ) {
+                Icon(R.drawable.ic_baseline_add_location_alt_24)
             }
 
             TransparentButton(
@@ -159,6 +170,12 @@ private object ObjectsDrawer {
             strokeWidth = 1f
             color = Color.BLACK
         }
+        val distance = NativePaint().apply {
+            style = android.graphics.Paint.Style.FILL_AND_STROKE
+            strokeWidth = 1f
+            color = Color.BLACK
+            textSize = 22f
+        }
     }
 
     fun CanvasOverlay.DrawScope.draw(
@@ -178,8 +195,10 @@ private object ObjectsDrawer {
                 span.pylon2.geoPoint.toPixelF(),
                 Paints.span
             )
-            span.photos.forEach {
-                canvas.drawCircle(it.photoWithGeoPoint.geoPoint.toPixelF(), 10f, Paints.photo)
+            if (zoomLevel >= 18) {
+                span.photos.forEach {
+                    canvas.drawCircle(it.photoWithGeoPoint.geoPoint.toPixelF(), 10f, Paints.photo)
+                }
             }
         }
 
@@ -206,6 +225,20 @@ private object ObjectsDrawer {
             photoLine.allPoints.forEach {
                 canvas.drawCircle(it.toPixelF(), 5f, Paints.placeForPhoto)
             }
+
+            distancesToPoints.forEach { draw(it) }
         }
+    }
+
+    private fun CanvasOverlay.DrawScope.draw(dist: DistanceBetweenGeoPoints) {
+        val px1 = dist.point1.toPixelF()
+        val px2 = dist.point2.toPixelF()
+        canvas.drawLine(px1, px2, Paints.normal)
+        canvas.drawText(
+            "${dist.distance.round(1)}",
+            (px1.x + px2.x) / 2,
+            (px1.y + px2.y) / 2,
+            Paints.distance
+        )
     }
 }

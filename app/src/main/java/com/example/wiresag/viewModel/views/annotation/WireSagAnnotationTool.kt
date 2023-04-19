@@ -24,6 +24,7 @@ import com.example.wiresag.state.SagTriangle
 import com.example.wiresag.state.WireSpanPhoto
 import com.example.wiresag.state.WireSpanPhotoEstimations
 import com.example.wiresag.ui.components.Icon
+import com.example.wiresag.ui.drawText
 import com.example.wiresag.ui.image.LayeredImage
 import com.example.wiresag.ui.image.rect
 import com.example.wiresag.ui.input.TransformParameters
@@ -155,10 +156,6 @@ private fun vertexLabelPaint(scale: Float) = NativePaint().apply {
     textSize = 24f / scale
 }
 
-private fun DrawScope.drawText(text: String, textStart: Offset, paint: NativePaint) {
-    drawContext.canvas.nativeCanvas.drawText(text, textStart.x, textStart.y, paint)
-}
-
 private fun radius(scale: Float) = 5f / scale
 
 private fun DrawScope.drawEstimations(estimations: WireSpanPhotoEstimations, scale: Float) {
@@ -180,7 +177,7 @@ private fun DrawScope.drawEstimations(estimations: WireSpanPhotoEstimations, sca
     val labelPaint = vertexLabelPaint(scale)
     drawText("A", estimations.triangle.a + Offset(0f, -15f) / scale, labelPaint)
     drawText("B", estimations.triangle.b + Offset(0f, -15f) / scale, labelPaint)
-    drawText("C", estimations.triangle.c + Offset(0f, 24 + 5f) / scale, labelPaint)
+    drawText("C", estimations.triangle.c + Offset(0f, 29f) / scale, labelPaint)
 }
 
 private fun DrawScope.drawPoints(points: List<Offset>, color: Color, scale: Float) {

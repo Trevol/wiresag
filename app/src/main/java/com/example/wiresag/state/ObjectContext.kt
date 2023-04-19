@@ -1,7 +1,6 @@
 package com.example.wiresag.state
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -36,17 +35,21 @@ class ObjectContext(
         nextSaveRequestEval = true
     }
 
-    fun markPylon(geoPoint: GeoPoint) {
+    fun markStandalonePylon(geoPoint: GeoPoint) {
         val distanceToNearestPylon = pylons.nearest(geoPoint)?.distance ?: Double.POSITIVE_INFINITY
         if (distanceToNearestPylon <= PylonDistanceThreshold) return
+        pylons.addItem(Pylon(geoPoint))
+    }
+
+    fun markPylonWithSpan(geoPoint: GeoPoint) {
+        val nearestPylonWithDist = pylons.nearest(geoPoint) ?: return
+        if (nearestPylonWithDist.distance <= PylonDistanceThreshold) return
 
         val thisPylon = pylons.addItem(Pylon(geoPoint))
-        if (pylons.size > 1) {
-            val otherPylon = pylons[pylons.lastIndex - 1]
-            val span = spans.addItem(WireSpan(thisPylon, otherPylon))
-            thisPylon.spans.add(span)
-            otherPylon.spans.add(span)
-        }
+
+        val span = spans.addItem(WireSpan(thisPylon, nearestPylonWithDist.item))
+        thisPylon.spans.add(span)
+        nearestPylonWithDist.item.spans.add(span)
     }
 
     fun nearestWireSpan(geoPoint: GeoPoint, maxDistance: Double) =

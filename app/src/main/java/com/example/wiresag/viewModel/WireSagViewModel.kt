@@ -76,9 +76,15 @@ class WireSagViewModel(
         }
     }
 
-    fun markPylon() {
+    fun markStandalonePylon() {
         currentLocation?.run {
-            objectContext.markPylon(this)
+            objectContext.markStandalonePylon(this)
+        }
+    }
+
+    fun markPylonWithSpan() {
+        currentLocation?.run {
+            objectContext.markPylonWithSpan(this)
         }
     }
 

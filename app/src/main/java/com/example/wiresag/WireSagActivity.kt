@@ -20,6 +20,7 @@ import com.example.wiresag.utils.PermissionsRequest
 import com.example.wiresag.viewModel.WireSagViewModel
 import com.example.wiresag.viewModel.views.View
 import org.osmdroid.config.Configuration
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File
 
@@ -89,11 +90,11 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
         )
 
         private fun locationProvider(): IMyLocationProvider {
-            /*val locationProvider = GpsMyLocationProvider(context)
+            val locationProvider = GpsMyLocationProvider(context)
                 .apply {
                     locationUpdateMinDistance = 0.001f
                     locationUpdateMinTime = 500
-                }*/
+                }
 
             /*val locationProvider = DebugLocationProvider(
                 //initialLocation = null,
@@ -102,7 +103,7 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
                 locationUpdateTime = 1000
             )*/
 
-            val locationProvider = StubLocationProvider()
+            //val locationProvider = StubLocationProvider()
 
             return locationProvider
         }
@@ -110,7 +111,6 @@ class WireSagActivity : FullScreenActivity(keepScreenOn = true) {
 
         fun viewModel(): WireSagViewModel {
             val imageStorage = FileImageStorage(settings.spanImagesDirectory)
-            //val imageStorage = InMemoryImageStorage()
             val entitiesStore = JsonFileEntitiesStore(settings.dataDirectory)
             return WireSagViewModel(
                 settings,
