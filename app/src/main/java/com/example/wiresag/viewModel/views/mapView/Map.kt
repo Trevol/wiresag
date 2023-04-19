@@ -1,4 +1,4 @@
-package com.example.wiresag.viewModel
+package com.example.wiresag.viewModel.views.mapView
 
 import android.graphics.Color
 import android.location.Location
@@ -23,35 +23,34 @@ import com.example.wiresag.ui.components.Icon
 import com.example.wiresag.ui.components.TransparentButton
 import com.example.wiresag.ui.drawCircle
 import com.example.wiresag.ui.drawLine
-import com.example.wiresag.ui.image.annotation.WireSagAnnotationTool
+import com.example.wiresag.viewModel.WireSagViewModel
 import org.osmdroid.util.GeoPoint
 
 @Composable
-fun WireSagViewModel.View() {
-    SaveDependencyEval()
-    WireSagAnnotation()
-    Map()
-}
-
-@Composable
-fun WireSagViewModel.WireSagAnnotation() {
-    if (photoForAnnotation != null) {
-        WireSagAnnotationTool(
-            modifier = Modifier
-                .fillMaxSize()
-                .zIndex(1f),
-            spanPhoto = photoForAnnotation!!,
-            imageById = { id -> objectContext.readImage(id) },
-            onClose = {
-                photoForAnnotation = null
+fun WireSagViewModel.Map() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        MapControls()
+        WireSagMap(
+            modifier = Modifier.fillMaxSize(),
+            onInitMapView = {
+                it.controller.setZoom(zoomLevel)
             },
-            onDelete = {
-                if (photoForAnnotation != null) {
-                    objectContext.deleteSpanPhoto(photoForAnnotation!!)
-                    photoForAnnotation = null
-                }
+            onUpdateMapView = ::updateMapView,
+            onSingleTapConfirmed = ::onSingleTapConfirmed,
+            onLongPress = initLongPressHandler(),
+            onZoom = { zoomLevel = it }
+        ) {
+            with(ObjectsDrawer) {
+                draw(
+                    zoomLevel,
+                    currentLocation,
+                    objectContext.pylons,
+                    objectContext.spans,
+                    nearestSpanMeasurements
+                )
             }
-        )
+        }
+
     }
 }
 
@@ -60,8 +59,14 @@ private fun WireSagViewModel.MapControls() {
 
     @Composable
     fun UpperButtons() {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TransparentButton(
+                onClick = { settingsMode = true },
+                enabled = currentLocation != null
+            ) {
+                Icon(R.drawable.ic_outline_settings_24)
+            }
+            Spacer(modifier = Modifier.weight(1f))
             TransparentButton(
                 onClick = { markPylon() },
                 enabled = currentLocation != null
@@ -92,39 +97,6 @@ private fun WireSagViewModel.MapControls() {
         )
     }
 
-}
-
-@Composable
-private fun WireSagViewModel.Map() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        MapControls()
-        WireSagMap(
-            modifier = Modifier.fillMaxSize(),
-            onInitMapView = {
-                it.controller.setZoom(zoomLevel)
-            },
-            onUpdateMapView = ::updateMapView,
-            onSingleTapConfirmed = ::onSingleTapConfirmed,
-            onLongPress = initLongPressHandler(),
-            onZoom = { zoomLevel = it }
-        ) {
-            with(ObjectsDrawer) {
-                draw(
-                    zoomLevel,
-                    currentLocation,
-                    objectContext.pylons,
-                    objectContext.spans,
-                    nearestSpanMeasurements
-                )
-            }
-        }
-
-    }
-}
-
-@Composable
-private fun WireSagViewModel.SaveDependencyEval() {
-    objectContext.saveRequest
 }
 
 @Composable

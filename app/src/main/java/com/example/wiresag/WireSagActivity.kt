@@ -17,8 +17,8 @@ import com.example.wiresag.storage.image.FileImageStorage
 import com.example.wiresag.ui.Main
 import com.example.wiresag.ui.NoPermissions
 import com.example.wiresag.utils.PermissionsRequest
-import com.example.wiresag.viewModel.View
 import com.example.wiresag.viewModel.WireSagViewModel
+import com.example.wiresag.viewModel.views.View
 import org.osmdroid.config.Configuration
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import java.io.File

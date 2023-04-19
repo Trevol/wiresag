@@ -1,6 +1,7 @@
 package com.example.wiresag.state
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshots.SnapshotStateList

@@ -1,4 +1,4 @@
-package com.example.wiresag.ui.image.annotation
+package com.example.wiresag.viewModel.views.annotation
 
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler

@@ -20,6 +20,7 @@ class WireSagViewModel(
     private val photoRequest: PhotoRequest,
     val objectContext: ObjectContext,
 ) {
+    var settingsMode by mutableStateOf(false)
     var zoomLevel by mutableStateOf(15.0)
     var providerLocation by mutableStateOf(null as Location?)
     private var isInitialLocation = false
