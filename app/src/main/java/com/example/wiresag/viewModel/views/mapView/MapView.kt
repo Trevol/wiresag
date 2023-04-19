@@ -183,23 +183,29 @@ private object ObjectsDrawer {
             }
         }
 
-        nearestSpanMeasurements?.run {
+        nearestSpanMeasurements?.let { draw(it) }
+
+        currentLocation?.run {
+            canvas.drawCircle(toPixelF(), 10f, Paints.location)
+        }
+    }
+
+    private fun CanvasOverlay.DrawScope.draw(measurements: WireSpanGeoMeasurements) {
+        with(measurements) {
+            //nearest span
             canvas.drawLine(
                 span.pylon1.geoPoint.toPixelF(),
                 span.pylon2.geoPoint.toPixelF(),
                 Paints.nearestSpan
             )
-
+            //normal (photo line)
             photoLine.normalPoints.let { (gp1, gp2) ->
                 canvas.drawLine(gp1.toPixelF(), gp2.toPixelF(), Paints.normal)
             }
+            //points on photo line
             photoLine.allPoints.forEach {
                 canvas.drawCircle(it.toPixelF(), 5f, Paints.placeForPhoto)
             }
-        }
-
-        currentLocation?.run {
-            canvas.drawCircle(toPixelF(), 10f, Paints.location)
         }
     }
 }
