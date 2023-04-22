@@ -217,6 +217,10 @@ private object ObjectsDrawer {
                 span.pylon2.geoPoint.toPixelF(),
                 Paints.nearestSpan
             )
+
+            val spanMidPoint = span.geoPoint.toPixelF()
+            canvas.drawText("${measurements.span.length.round(1)}", spanMidPoint.x, spanMidPoint.y, Paints.distance)
+
             //normal (photo line)
             photoLine.normalPoints.let { (gp1, gp2) ->
                 canvas.drawLine(gp1.toPixelF(), gp2.toPixelF(), Paints.normal)
