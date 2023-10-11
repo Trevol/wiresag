@@ -2,6 +2,8 @@ package com.example.wiresag.math
 
 import androidx.compose.ui.geometry.Offset
 
+// https://ru.wikipedia.org/wiki/Парабола#Расчёт_коэффициентов_квадратичной_функции
+
 class Parabola(val a: Float, val b: Float, val c: Float) {
     val vertex = (b * b - 4 * a * c).let { d -> Offset(-b / (2 * a), -d / (4 * a)) }
     operator fun invoke(x: Float): Float {
